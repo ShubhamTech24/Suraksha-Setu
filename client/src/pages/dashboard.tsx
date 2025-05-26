@@ -41,21 +41,21 @@ export default function Dashboard() {
       <Header />
       <AlertBar />
       
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <main className="w-full px-2 sm:px-4 py-4 space-y-6">
         {/* Hero Section */}
-        <div className="text-center py-6">
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+        <div className="text-center py-4">
+          <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             SurakshaSetu
           </h1>
-          <p className="text-lg text-slate-600 dark:text-slate-300 mt-2">
+          <p className="text-base text-slate-600 dark:text-slate-300 mt-1">
             Advanced Security Monitoring & Alert System
           </p>
         </div>
 
         <DashboardStats />
         
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          <div className="lg:col-span-3 space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+          <div className="lg:col-span-1 space-y-4">
             <LocationSelector 
               onLocationChange={setSelectedLocation}
               currentLocation={selectedLocation}
@@ -63,12 +63,12 @@ export default function Dashboard() {
             <QuickActions />
             <NetworkStatusMonitor />
           </div>
-          <div className="lg:col-span-9 space-y-8">
+          <div className="lg:col-span-3">
             <RealtimeAlerts />
           </div>
         </div>
         
-        <div className="mt-8">
+        <div className="w-full">
           <LeafletSafetyMap />
         </div>
         
