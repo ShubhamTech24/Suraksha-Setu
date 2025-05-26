@@ -151,25 +151,50 @@ export async function generateThreatPrediction(userLat?: number, userLng?: numbe
     let confidence = 0.6;
     let patternConfidence = 0.5;
     
+    const riskFactors: string[] = [];
+    const recommendations: string[] = [];
+    
     // Location-based threat assessment
     if (userLat && userLng) {
-      const distanceFromBorder = calculateHaversineDistance(userLat, userLng, 34.0837, 74.7973); // Distance to nearest LOC point
+      const distanceFromBorder = calculateDistanceFromBorder(userLat, userLng);
       
-      // Adjust threat level based on proximity to border
-      if (distanceFromBorder < 5) { // Within 5km of border
+      // Adjust threat level based on proximity to border and current tensions
+      if (distanceFromBorder < 2) { // Within 2km of border - immediate border area
         threatLevel = 'high';
-        confidence = Math.max(confidence, 0.8);
-      } else if (distanceFromBorder < 15) { // Within 15km of border
+        confidence = Math.max(confidence, 0.9);
+        riskFactors.push('Located in immediate border zone');
+      } else if (distanceFromBorder < 10) { // Within 10km of border
         threatLevel = 'medium';  
+        confidence = Math.max(confidence, 0.8);
+        riskFactors.push('Located near border area');
+      } else if (distanceFromBorder < 25) { // Within 25km of border
+        threatLevel = 'low';
         confidence = Math.max(confidence, 0.7);
-      } else if (distanceFromBorder < 50) { // Within 50km of border
+        riskFactors.push('Located in border district');
+      } else if (distanceFromBorder < 100) { // Within 100km of border
         threatLevel = 'low';
         confidence = Math.max(confidence, 0.6);
       } else {
         // Far from border areas - very low threat
         threatLevel = 'low';
-        confidence = 0.5;
+        confidence = 0.4;
       }
+      
+      // Add location-specific recommendations
+      if (distanceFromBorder < 10) {
+        recommendations.push('Stay alert for unusual activities');
+        recommendations.push('Keep emergency contacts ready');
+      }
+      if (distanceFromBorder < 2) {
+        recommendations.push('Avoid unnecessary travel near fence line');
+        recommendations.push('Report any suspicious movements immediately');
+      }
+    } else {
+      // No location data - use general assessment
+      threatLevel = 'low';
+      confidence = 0.5;
+      riskFactors.push('Location data unavailable');
+      recommendations.push('Enable location services for region-specific updates');
     }
     
     // Alert-based assessment (combines with location assessment)
@@ -186,9 +211,6 @@ export async function generateThreatPrediction(userLat?: number, userLng?: numbe
       confidence = Math.max(confidence, 0.7);
       patternConfidence = 0.6;
     }
-    
-    const riskFactors = [];
-    const recommendations = [];
     
     if (emergencyCount > 0) {
       riskFactors.push('Active security incidents reported');
