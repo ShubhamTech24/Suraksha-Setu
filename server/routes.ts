@@ -30,6 +30,15 @@ const upload = multer({
 // WebSocket connections storage
 const wsConnections = new Set<WebSocket>();
 
+// Store user locations for real-time tracking
+const userLocations = new Map<string, {
+  latitude: number;
+  longitude: number;
+  accuracy?: number;
+  timestamp: string;
+  sessionId: string;
+}>();
+
 export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
 
@@ -281,6 +290,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(contacts);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch emergency contacts" });
+    }
+  });
+
+  // Location tracking endpoints
+  app.post("/api/location/update", async (req, res) => {
+    try {
+      const { latitude, longitude, accuracy, timestamp } = req.body;
+      const sessionId = req.headers['x-session-id'] as string || 'anonymous';
+      
+      if (!latitude || !longitude) {
+        return res.status(400).json({ message: "Latitude and longitude are required" });
+      }
+
+      // Store location in memory
+      userLocations.set(sessionId, {
+        latitude: parseFloat(latitude),
+        longitude: parseFloat(longitude),
+        accuracy: accuracy ? parseFloat(accuracy) : undefined,
+        timestamp: timestamp || new Date().toISOString(),
+        sessionId,
+      });
+
+      // Broadcast location update to all connected clients
+      broadcast({
+        type: 'location_update',
+        data: {
+          sessionId,
+          latitude: parseFloat(latitude),
+          longitude: parseFloat(longitude),
+          accuracy,
+          timestamp: timestamp || new Date().toISOString(),
+        }
+      });
+
+      res.json({ 
+        success: true, 
+        message: "Location updated successfully",
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Location update error:', error);
+      res.status(500).json({ message: "Failed to update location" });
+    }
+  });
+
+  app.get("/api/location/current", async (req, res) => {
+    try {
+      const sessionId = req.headers['x-session-id'] as string || 'anonymous';
+      const location = userLocations.get(sessionId);
+      
+      if (!location) {
+        return res.status(404).json({ message: "No location data found" });
+      }
+
+      res.json(location);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get current location" });
+    }
+  });
+
+  app.get("/api/location/all", async (req, res) => {
+    try {
+      const allLocations = Array.from(userLocations.values());
+      res.json(allLocations);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get all locations" });
     }
   });
 

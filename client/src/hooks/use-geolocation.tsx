@@ -13,6 +13,7 @@ interface UseGeolocationOptions {
   timeout?: number;
   maximumAge?: number;
   watch?: boolean;
+  updateInterval?: number; // Interval for continuous updates in milliseconds
 }
 
 export function useGeolocation(options: UseGeolocationOptions = {}) {
@@ -26,9 +27,10 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
 
   const {
     enableHighAccuracy = true,
-    timeout = 10000,
-    maximumAge = 300000, // 5 minutes
-    watch = false,
+    timeout = 15000,
+    maximumAge = 5000, // 5 seconds for fresh location data
+    watch = true, // Enable continuous tracking by default
+    updateInterval = 10000, // Update every 10 seconds
   } = options;
 
   useEffect(() => {
@@ -62,13 +64,13 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
       
       switch (error.code) {
         case error.PERMISSION_DENIED:
-          errorMessage = "Location access denied by user";
+          errorMessage = "Location access denied. Please enable location permissions for SurakshaSetu to receive area-specific alerts.";
           break;
         case error.POSITION_UNAVAILABLE:
-          errorMessage = "Location information unavailable";
+          errorMessage = "Location information unavailable. Please check your device's GPS settings.";
           break;
         case error.TIMEOUT:
-          errorMessage = "Location request timed out";
+          errorMessage = "Location request timed out. Trying again...";
           break;
       }
 
@@ -80,9 +82,22 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
     };
 
     let watchId: number | undefined;
+    let intervalId: NodeJS.Timeout | undefined;
 
+    // Start real-time location tracking
     if (watch) {
+      // Use watchPosition for continuous GPS tracking
       watchId = navigator.geolocation.watchPosition(onSuccess, onError, options);
+      
+      // Add interval backup for enhanced real-time updates
+      if (updateInterval > 0) {
+        intervalId = setInterval(() => {
+          navigator.geolocation.getCurrentPosition(onSuccess, onError, {
+            ...options,
+            maximumAge: 0, // Force fresh location
+          });
+        }, updateInterval);
+      }
     } else {
       navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
     }
@@ -91,8 +106,11 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
       if (watchId !== undefined) {
         navigator.geolocation.clearWatch(watchId);
       }
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
     };
-  }, [enableHighAccuracy, timeout, maximumAge, watch]);
+  }, [enableHighAccuracy, timeout, maximumAge, watch, updateInterval]);
 
   const refresh = () => {
     setState(prev => ({ ...prev, loading: true, error: null }));
