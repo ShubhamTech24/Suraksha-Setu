@@ -7,6 +7,7 @@ import { API_ENDPOINTS } from "@/lib/constants";
 import { useGeolocation } from "@/hooks/use-geolocation";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
+import { calculateDistanceToLOC, formatDistance, findNearest } from "@/lib/distance-utils";
 
 export function QuickActions() {
   const { toast } = useToast();
@@ -16,6 +17,19 @@ export function QuickActions() {
     queryKey: [API_ENDPOINTS.AI_PREDICTION],
     refetchInterval: 300000, // Refresh every 5 minutes
   });
+
+  const { data: safeZones } = useQuery({
+    queryKey: [API_ENDPOINTS.SAFE_ZONES],
+  });
+
+  // Calculate real distances when user location is available
+  const distanceToLOC = latitude && longitude ? calculateDistanceToLOC(latitude, longitude) : null;
+  const nearestSafeZone = latitude && longitude && safeZones ? 
+    findNearest(latitude, longitude, safeZones.map((zone: any) => ({ 
+      lat: zone.latitude, 
+      lng: zone.longitude, 
+      ...zone 
+    }))) : null;
 
   const handleEmergencyCall = () => {
     toast({
@@ -125,13 +139,13 @@ export function QuickActions() {
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-600 dark:text-gray-400">Distance from LOC</span>
             <span className="text-sm font-semibold text-gray-900 dark:text-white">
-              {latitude && longitude ? "12.3 km" : "Unknown"}
+              {distanceToLOC ? formatDistance(distanceToLOC) : "Unknown"}
             </span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-600 dark:text-gray-400">Nearest Safe Zone</span>
             <span className="text-sm font-semibold text-gray-900 dark:text-white">
-              {latitude && longitude ? "850 m" : "Unknown"}
+              {nearestSafeZone ? formatDistance(nearestSafeZone.distance) : "Unknown"}
             </span>
           </div>
           <div className="flex items-center justify-between">
