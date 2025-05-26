@@ -115,6 +115,50 @@
   box-shadow: 0 0 10px rgba(249, 115, 22, 0.5);
 }
 
+/* Threat Map Animations */
+.threat-pulse {
+  animation: threat-pulse 2s ease-in-out infinite;
+}
+
+@keyframes threat-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.9;
+  }
+}
+
+.critical-zone-glow {
+  animation: critical-glow 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes critical-glow {
+  from {
+    filter: drop-shadow(0 0 5px rgba(239, 68, 68, 0.6));
+  }
+  to {
+    filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.9));
+  }
+}
+
+.threat-zone-ripple {
+  animation: ripple-effect 3s ease-out infinite;
+}
+
+@keyframes ripple-effect {
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
 :root {
   --background: 0 0% 100%;
   --foreground: 20 14% 4%;

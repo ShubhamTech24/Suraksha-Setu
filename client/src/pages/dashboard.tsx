@@ -3,7 +3,7 @@ import { AlertBar } from "@/components/alert-bar";
 import { DashboardStats } from "@/components/dashboard-stats";
 import { RealtimeAlerts } from "@/components/realtime-alerts";
 import { QuickActions } from "@/components/quick-actions";
-import { LeafletSafetyMap } from "@/components/leaflet-safety-map";
+import { InteractiveThreatMap } from "@/components/interactive-threat-map";
 import { ReportingForm } from "@/components/reporting-form";
 import { EducationCenter } from "@/components/education-center";
 import { CommunicationCenter } from "@/components/communication-center";
@@ -70,7 +70,7 @@ export default function Dashboard() {
         </div>
         
         <div className="mt-8">
-          <LeafletSafetyMap />
+          <InteractiveThreatMap />
         </div>
         
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
