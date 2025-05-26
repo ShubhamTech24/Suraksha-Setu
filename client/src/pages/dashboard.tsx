@@ -54,17 +54,17 @@ export default function Dashboard() {
 
         <DashboardStats />
         
-        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
-          <div className="xl:col-span-3 space-y-8">
-            <RealtimeAlerts />
-          </div>
-          <div className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="lg:col-span-3 space-y-6">
             <LocationSelector 
               onLocationChange={setSelectedLocation}
               currentLocation={selectedLocation}
             />
             <QuickActions />
             <NetworkStatusMonitor />
+          </div>
+          <div className="lg:col-span-9 space-y-8">
+            <RealtimeAlerts />
           </div>
         </div>
         
