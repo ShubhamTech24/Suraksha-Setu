@@ -4,6 +4,7 @@ import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
 import { insertReportSchema, insertThreatSchema, insertAlertSchema } from "@shared/schema";
 import { generateThreatPrediction, fetchSecurityAlerts, convertToAppAlerts } from "./news-api";
+import { analyzeThreat, analyzeImage } from "./simple-analysis";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -102,7 +103,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Combine and sort by timestamp
       const allAlerts = [...dbAlerts, ...newsAlerts].sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        (a, b) => new Date(b.createdAt || new Date()).getTime() - new Date(a.createdAt || new Date()).getTime()
       );
       
       res.json(allAlerts);
