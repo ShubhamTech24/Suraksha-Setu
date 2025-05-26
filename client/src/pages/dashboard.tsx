@@ -9,11 +9,14 @@ import { EducationCenter } from "@/components/education-center";
 import { CommunicationCenter } from "@/components/communication-center";
 import { MobileNavigation } from "@/components/mobile-navigation";
 import { NetworkStatusMonitor } from "@/components/network-status";
+import { LocationSelector } from "@/components/location-selector";
 import { useWebSocket } from "@/hooks/use-websocket";
 import { useToast } from "@/hooks/use-toast";
+import { useLocationContext } from "@/hooks/use-location-context";
 
 export default function Dashboard() {
   const { toast } = useToast();
+  const { selectedLocation, setSelectedLocation } = useLocationContext();
 
   useWebSocket({
     onMessage: (data) => {
