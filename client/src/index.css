@@ -2,53 +2,69 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Defense Theme - Indian Military Styling */
+/* Modern Security Theme - Elegant & Professional */
 :root {
-  --background: 210 20% 98%;
-  --foreground: 215 25% 15%;
-  --card: 210 15% 97%;
-  --card-foreground: 215 25% 15%;
-  --popover: 210 15% 98%;
-  --popover-foreground: 215 25% 15%;
-  --primary: 142 86% 28%; /* Military Green */
-  --primary-foreground: 210 20% 98%;
-  --secondary: 33 100% 50%; /* Saffron */
-  --secondary-foreground: 215 25% 15%;
-  --muted: 210 15% 95%;
-  --muted-foreground: 215 15% 45%;
-  --accent: 19 91% 56%; /* Indian Flag Orange */
-  --accent-foreground: 215 25% 15%;
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 210 20% 98%;
-  --border: 214 15% 88%;
-  --input: 214 15% 88%;
-  --ring: 142 86% 28%;
-  --radius: 0.5rem;
+  --background: 220 15% 98%; /* #F8FAFC */
+  --foreground: 220 25% 8%; /* #0F172A */
+  --card: 0 0% 100%; /* #FFFFFF */
+  --card-foreground: 220 25% 8%; /* #0F172A */
+  --popover: 0 0% 100%; /* #FFFFFF */
+  --popover-foreground: 220 25% 8%; /* #0F172A */
+  --primary: 210 100% 56%; /* #1E90FF */
+  --primary-foreground: 0 0% 100%; /* #FFFFFF */
+  --secondary: 210 30% 96%; /* #F1F5F9 */
+  --secondary-foreground: 220 25% 20%; /* #334155 */
+  --muted: 210 20% 95%; /* #F1F5F9 */
+  --muted-foreground: 220 15% 50%; /* #64748B */
+  --accent: 262 83% 58%; /* #8B5CF6 */
+  --accent-foreground: 0 0% 100%; /* #FFFFFF */
+  --destructive: 0 85% 60%; /* #EF4444 */
+  --destructive-foreground: 0 0% 100%; /* #FFFFFF */
+  --border: 220 15% 90%; /* #E2E8F0 */
+  --input: 220 15% 90%; /* #E2E8F0 */
+  --ring: 210 100% 56%; /* #1E90FF */
+  --radius: 0.75rem;
 }
 
 .dark {
-  --background: 215 25% 8%;
-  --foreground: 210 15% 92%;
-  --card: 215 25% 10%;
-  --card-foreground: 210 15% 92%;
-  --popover: 215 25% 10%;
-  --popover-foreground: 210 15% 92%;
-  --primary: 142 86% 28%;
-  --primary-foreground: 210 20% 98%;
-  --secondary: 33 100% 40%;
-  --secondary-foreground: 210 15% 92%;
-  --muted: 215 25% 15%;
-  --muted-foreground: 215 15% 65%;
-  --accent: 19 91% 50%;
-  --accent-foreground: 210 15% 92%;
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 210 20% 98%;
-  --border: 215 25% 20%;
-  --input: 215 25% 20%;
-  --ring: 142 86% 28%;
+  --background: 220 25% 5%; /* #0B1426 */
+  --foreground: 220 15% 95%; /* #F1F5F9 */
+  --card: 220 25% 8%; /* #1A2332 */
+  --card-foreground: 220 15% 95%; /* #F1F5F9 */
+  --popover: 220 25% 8%; /* #1A2332 */
+  --popover-foreground: 220 15% 95%; /* #F1F5F9 */
+  --primary: 210 100% 56%; /* #1E90FF */
+  --primary-foreground: 0 0% 100%; /* #FFFFFF */
+  --secondary: 220 25% 15%; /* #334155 */
+  --secondary-foreground: 220 15% 85%; /* #CBD5E1 */
+  --muted: 220 25% 12%; /* #2D3748 */
+  --muted-foreground: 220 15% 70%; /* #94A3B8 */
+  --accent: 262 83% 58%; /* #8B5CF6 */
+  --accent-foreground: 0 0% 100%; /* #FFFFFF */
+  --destructive: 0 85% 60%; /* #EF4444 */
+  --destructive-foreground: 0 0% 100%; /* #FFFFFF */
+  --border: 220 25% 15%; /* #334155 */
+  --input: 220 25% 15%; /* #334155 */
+  --ring: 210 100% 56%; /* #1E90FF */
 }
 
-/* Defense UI Enhancements */
+/* Modern Glass Morphism & Elegant UI */
+.glass-card {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+.dark .glass-card {
+  background: rgba(26, 35, 50, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.elegant-gradient {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
 .defense-gradient {
   background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 50%, #166534 100%);
 }

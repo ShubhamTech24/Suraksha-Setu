@@ -37,18 +37,28 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-900 tactical-grid">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <Header />
       <AlertBar />
       
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        {/* Hero Section */}
+        <div className="text-center py-6">
+          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            SurakshaSetu
+          </h1>
+          <p className="text-lg text-slate-600 dark:text-slate-300 mt-2">
+            Advanced Security Monitoring & Alert System
+          </p>
+        </div>
+
         <DashboardStats />
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
-          <div className="lg:col-span-2">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+          <div className="xl:col-span-3 space-y-8">
             <RealtimeAlerts />
           </div>
-          <div className="space-y-8">
+          <div className="space-y-6">
             <LocationSelector 
               onLocationChange={setSelectedLocation}
               currentLocation={selectedLocation}
