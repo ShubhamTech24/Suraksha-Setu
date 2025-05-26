@@ -376,10 +376,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // AI threat prediction endpoint
+  // AI threat prediction endpoint with location-based assessment
   app.get("/api/ai/threat-prediction", async (req, res) => {
     try {
-      const prediction = await generateThreatPrediction();
+      // Get user location from query parameters or stored location
+      const lat = parseFloat(req.query.lat as string);
+      const lng = parseFloat(req.query.lng as string);
+      
+      // Use location-based threat prediction from news-api
+      const prediction = await generateThreatPrediction(
+        !isNaN(lat) ? lat : undefined, 
+        !isNaN(lng) ? lng : undefined
+      );
       res.json(prediction);
     } catch (error) {
       res.status(500).json({ message: "Failed to generate threat prediction" });
