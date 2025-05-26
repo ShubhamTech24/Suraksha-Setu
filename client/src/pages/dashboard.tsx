@@ -8,7 +8,7 @@ import { ReportingForm } from "@/components/reporting-form";
 import { EducationCenter } from "@/components/education-center";
 import { CommunicationCenter } from "@/components/communication-center";
 import { MobileNavigation } from "@/components/mobile-navigation";
-import { LocationTracker } from "@/components/location-tracker";
+import { NetworkStatusMonitor } from "@/components/network-status";
 import { useWebSocket } from "@/hooks/use-websocket";
 import { useToast } from "@/hooks/use-toast";
 
@@ -34,7 +34,7 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-900 tactical-grid">
       <Header />
       <AlertBar />
       
@@ -47,7 +47,7 @@ export default function Dashboard() {
           </div>
           <div className="space-y-8">
             <QuickActions />
-            <LocationTracker />
+            <NetworkStatusMonitor />
           </div>
         </div>
         

@@ -2,6 +2,103 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Defense Theme - Indian Military Styling */
+:root {
+  --background: 210 20% 98%;
+  --foreground: 215 25% 15%;
+  --card: 210 15% 97%;
+  --card-foreground: 215 25% 15%;
+  --popover: 210 15% 98%;
+  --popover-foreground: 215 25% 15%;
+  --primary: 142 86% 28%; /* Military Green */
+  --primary-foreground: 210 20% 98%;
+  --secondary: 33 100% 50%; /* Saffron */
+  --secondary-foreground: 215 25% 15%;
+  --muted: 210 15% 95%;
+  --muted-foreground: 215 15% 45%;
+  --accent: 19 91% 56%; /* Indian Flag Orange */
+  --accent-foreground: 215 25% 15%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 210 20% 98%;
+  --border: 214 15% 88%;
+  --input: 214 15% 88%;
+  --ring: 142 86% 28%;
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: 215 25% 8%;
+  --foreground: 210 15% 92%;
+  --card: 215 25% 10%;
+  --card-foreground: 210 15% 92%;
+  --popover: 215 25% 10%;
+  --popover-foreground: 210 15% 92%;
+  --primary: 142 86% 28%;
+  --primary-foreground: 210 20% 98%;
+  --secondary: 33 100% 40%;
+  --secondary-foreground: 210 15% 92%;
+  --muted: 215 25% 15%;
+  --muted-foreground: 215 15% 65%;
+  --accent: 19 91% 50%;
+  --accent-foreground: 210 15% 92%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 210 20% 98%;
+  --border: 215 25% 20%;
+  --input: 215 25% 20%;
+  --ring: 142 86% 28%;
+}
+
+/* Defense UI Enhancements */
+.defense-gradient {
+  background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 50%, #166534 100%);
+}
+
+.indian-flag-gradient {
+  background: linear-gradient(to right, #ff9933 0%, #ffffff 50%, #138808 100%);
+}
+
+.military-panel {
+  background: linear-gradient(145deg, rgba(21, 128, 61, 0.1) 0%, rgba(30, 58, 138, 0.1) 100%);
+  border: 1px solid rgba(21, 128, 61, 0.2);
+  backdrop-filter: blur(8px);
+}
+
+.status-active {
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
+  border-color: #22c55e;
+}
+
+.status-critical {
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+  border-color: #ef4444;
+}
+
+.defense-text {
+  font-family: 'Segoe UI', 'Roboto', 'Liberation Sans', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.tactical-grid {
+  background-image: 
+    linear-gradient(rgba(21, 128, 61, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(21, 128, 61, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Glowing effects for critical elements */
+.glow-green {
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+}
+
+.glow-red {
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+}
+
+.glow-orange {
+  box-shadow: 0 0 10px rgba(249, 115, 22, 0.5);
+}
+
 :root {
   --background: 0 0% 100%;
   --foreground: 20 14% 4%;

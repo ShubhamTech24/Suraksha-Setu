@@ -1,53 +1,55 @@
 import { useLocationService } from "@/hooks/use-location-service";
-import { useReverseGeocoding } from "@/hooks/use-reverse-geocoding";
 import { useWebSocket } from "@/hooks/use-websocket";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Navigation, Satellite, RefreshCw, AlertCircle, MapIcon } from "lucide-react";
+import { Shield, Wifi, Server, Activity, RefreshCw, AlertTriangle, Radio } from "lucide-react";
 import { useState, useEffect } from "react";
 
-export function LocationTracker() {
+export function NetworkStatusMonitor() {
   const locationService = useLocationService({
     autoStart: true,
-    transmissionInterval: 30000, // Send every 30 seconds
+    transmissionInterval: 30000,
     enableHistory: true,
   });
 
-  const [locationUpdates, setLocationUpdates] = useState<any[]>([]);
+  const [networkUpdates, setNetworkUpdates] = useState<any[]>([]);
+  const [connectionStatus, setConnectionStatus] = useState({
+    websocket: 'disconnected',
+    database: 'unknown',
+    lastPing: null as string | null,
+  });
 
-  // Get city name from coordinates
-  const locationInfo = useReverseGeocoding(
-    locationService.currentLocation.latitude,
-    locationService.currentLocation.longitude
-  );
-
-  // Listen for WebSocket location updates
+  // Monitor WebSocket and network status
   useWebSocket({
     onMessage: (data) => {
       if (data.type === 'location_update') {
-        setLocationUpdates(prev => [data.data, ...prev.slice(0, 9)]); // Keep last 10 updates
+        setNetworkUpdates(prev => [data.data, ...prev.slice(0, 9)]);
       }
+      setConnectionStatus(prev => ({
+        ...prev,
+        websocket: 'connected',
+        lastPing: new Date().toISOString(),
+      }));
+    },
+    onConnect: () => {
+      setConnectionStatus(prev => ({ ...prev, websocket: 'connected' }));
+    },
+    onError: () => {
+      setConnectionStatus(prev => ({ ...prev, websocket: 'error' }));
+    },
+    onDisconnect: () => {
+      setConnectionStatus(prev => ({ ...prev, websocket: 'disconnected' }));
     },
   });
 
-  const formatAccuracy = (accuracy?: number) => {
-    if (!accuracy) return "Unknown";
-    if (accuracy < 5) return "Very High";
-    if (accuracy < 15) return "High";
-    if (accuracy < 50) return "Medium";
-    return "Low";
+  const getNetworkStatus = () => {
+    if (connectionStatus.websocket === 'connected') return { status: "SECURED", color: "green", icon: Shield };
+    if (connectionStatus.websocket === 'error') return { status: "COMPROMISED", color: "red", icon: AlertTriangle };
+    return { status: "OFFLINE", color: "gray", icon: Wifi };
   };
 
-  const getLocationStatus = () => {
-    if (locationService.currentLocation.loading) return { status: "loading", color: "yellow" };
-    if (locationService.currentLocation.error) return { status: "error", color: "red" };
-    if (!locationService.isTracking) return { status: "disabled", color: "gray" };
-    if (locationService.currentLocation.latitude) return { status: "active", color: "green" };
-    return { status: "unknown", color: "gray" };
-  };
-
-  const locationStatus = getLocationStatus();
+  const networkStatus = getNetworkStatus();
 
   return (
     <div className="space-y-4">
