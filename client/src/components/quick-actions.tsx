@@ -5,25 +5,30 @@ import { Progress } from "@/components/ui/progress";
 import { useQuery } from "@tanstack/react-query";
 import { API_ENDPOINTS } from "@/lib/constants";
 import { useGeolocation } from "@/hooks/use-geolocation";
+import { useLocationContext } from "@/hooks/use-location-context";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
-import { calculateDistanceToLOC, formatDistance, findNearest } from "@/lib/distance-utils";
 
 export function QuickActions() {
   const { toast } = useToast();
   const { latitude, longitude, error } = useGeolocation();
+  const { selectedLocation } = useLocationContext();
+  
+  // Use selected location if available, otherwise fall back to GPS
+  const activeLocation = selectedLocation || (latitude && longitude ? { lat: latitude, lng: longitude } : null);
   
   const { data: aiPrediction } = useQuery({
-    queryKey: [API_ENDPOINTS.AI_PREDICTION, latitude, longitude],
+    queryKey: [API_ENDPOINTS.AI_PREDICTION, activeLocation?.lat, activeLocation?.lng],
     queryFn: () => {
       const url = new URL(API_ENDPOINTS.AI_PREDICTION, window.location.origin);
-      if (latitude && longitude) {
-        url.searchParams.set('lat', latitude.toString());
-        url.searchParams.set('lng', longitude.toString());
+      if (activeLocation) {
+        url.searchParams.set('lat', activeLocation.lat.toString());
+        url.searchParams.set('lng', activeLocation.lng.toString());
       }
       return fetch(url.toString()).then(res => res.json());
     },
     refetchInterval: 300000, // Refresh every 5 minutes
+    enabled: !!activeLocation, // Only run query when we have a location
   });
 
   const { data: safeZones } = useQuery({

@@ -49,6 +49,10 @@ export default function Dashboard() {
             <RealtimeAlerts />
           </div>
           <div className="space-y-8">
+            <LocationSelector 
+              onLocationChange={setSelectedLocation}
+              currentLocation={selectedLocation}
+            />
             <QuickActions />
             <NetworkStatusMonitor />
           </div>
