@@ -14,7 +14,15 @@ export function QuickActions() {
   const { latitude, longitude, error } = useGeolocation();
   
   const { data: aiPrediction } = useQuery({
-    queryKey: [API_ENDPOINTS.AI_PREDICTION],
+    queryKey: [API_ENDPOINTS.AI_PREDICTION, latitude, longitude],
+    queryFn: () => {
+      const url = new URL(API_ENDPOINTS.AI_PREDICTION, window.location.origin);
+      if (latitude && longitude) {
+        url.searchParams.set('lat', latitude.toString());
+        url.searchParams.set('lng', longitude.toString());
+      }
+      return fetch(url.toString()).then(res => res.json());
+    },
     refetchInterval: 300000, // Refresh every 5 minutes
   });
 
