@@ -1,9 +1,10 @@
 import { useLocationService } from "@/hooks/use-location-service";
+import { useReverseGeocoding } from "@/hooks/use-reverse-geocoding";
 import { useWebSocket } from "@/hooks/use-websocket";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Navigation, Satellite, RefreshCw, AlertCircle } from "lucide-react";
+import { MapPin, Navigation, Satellite, RefreshCw, AlertCircle, MapIcon } from "lucide-react";
 import { useState, useEffect } from "react";
 
 export function LocationTracker() {
@@ -14,6 +15,12 @@ export function LocationTracker() {
   });
 
   const [locationUpdates, setLocationUpdates] = useState<any[]>([]);
+
+  // Get city name from coordinates
+  const locationInfo = useReverseGeocoding(
+    locationService.currentLocation.latitude,
+    locationService.currentLocation.longitude
+  );
 
   // Listen for WebSocket location updates
   useWebSocket({
@@ -67,12 +74,30 @@ export function LocationTracker() {
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm font-medium">
                 <MapPin className="h-4 w-4" />
-                Current Position
+                Current Location
               </div>
               {locationService.currentLocation.latitude && locationService.currentLocation.longitude ? (
                 <div className="space-y-1 text-sm">
-                  <div>Lat: {locationService.currentLocation.latitude.toFixed(6)}</div>
-                  <div>Lng: {locationService.currentLocation.longitude.toFixed(6)}</div>
+                  {/* City/Area Name */}
+                  <div className="font-medium text-base">
+                    {locationInfo.loading ? (
+                      <span className="text-muted-foreground">Getting location...</span>
+                    ) : locationInfo.error ? (
+                      <span className="text-red-500">Location unavailable</span>
+                    ) : (
+                      <span className="text-blue-600 dark:text-blue-400">
+                        {locationInfo.city || "Unknown City"}
+                        {locationInfo.district && locationInfo.district !== locationInfo.city && (
+                          <span className="text-muted-foreground">, {locationInfo.district}</span>
+                        )}
+                      </span>
+                    )}
+                  </div>
+                  {/* Coordinates */}
+                  <div className="text-xs text-muted-foreground">
+                    <div>Lat: {locationService.currentLocation.latitude.toFixed(6)}</div>
+                    <div>Lng: {locationService.currentLocation.longitude.toFixed(6)}</div>
+                  </div>
                 </div>
               ) : (
                 <div className="text-sm text-muted-foreground">Location not available</div>

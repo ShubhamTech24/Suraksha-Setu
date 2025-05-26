@@ -27,10 +27,10 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
 
   const {
     enableHighAccuracy = true,
-    timeout = 15000,
-    maximumAge = 5000, // 5 seconds for fresh location data
+    timeout = 30000, // Increased timeout to 30 seconds
+    maximumAge = 10000, // Allow slightly older data to reduce timeouts
     watch = true, // Enable continuous tracking by default
-    updateInterval = 10000, // Update every 10 seconds
+    updateInterval = 15000, // Update every 15 seconds
   } = options;
 
   useEffect(() => {
