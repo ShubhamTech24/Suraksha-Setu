@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
 import { insertReportSchema, insertThreatSchema, insertAlertSchema } from "@shared/schema";
-import { analyzeImage, analyzeThreat, generateThreatPrediction } from "./openai";
+import { generateThreatPrediction, fetchSecurityAlerts, convertToAppAlerts } from "./news-api";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -92,13 +92,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get real-time alerts
+  // Get real-time alerts (combines database alerts with news-based alerts)
   app.get("/api/alerts", async (req, res) => {
     try {
-      const alerts = await storage.getActiveAlerts();
-      res.json(alerts);
+      const [dbAlerts, newsAlerts] = await Promise.all([
+        storage.getActiveAlerts(),
+        fetchSecurityAlerts().then(convertToAppAlerts)
+      ]);
+      
+      // Combine and sort by timestamp
+      const allAlerts = [...dbAlerts, ...newsAlerts].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      
+      res.json(allAlerts);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch alerts" });
+      console.error("Error fetching alerts:", error);
+      // Fallback to just database alerts if news fetch fails
+      try {
+        const dbAlerts = await storage.getActiveAlerts();
+        res.json(dbAlerts);
+      } catch (dbError) {
+        res.status(500).json({ message: "Failed to fetch alerts" });
+      }
     }
   });
 
