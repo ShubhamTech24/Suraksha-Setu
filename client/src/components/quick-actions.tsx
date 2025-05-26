@@ -9,6 +9,17 @@ import { useLocationContext } from "@/hooks/use-location-context";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 
+// Simple distance formatting utility
+const formatDistance = (distanceKm: number): string => {
+  if (distanceKm < 1) {
+    return `${Math.round(distanceKm * 1000)} m`;
+  } else if (distanceKm < 10) {
+    return `${distanceKm.toFixed(1)} km`;
+  } else {
+    return `${Math.round(distanceKm)} km`;
+  }
+};
+
 export function QuickActions() {
   const { toast } = useToast();
   const { latitude, longitude, error } = useGeolocation();
@@ -35,14 +46,23 @@ export function QuickActions() {
     queryKey: [API_ENDPOINTS.SAFE_ZONES],
   });
 
-  // Calculate real distances when user location is available
-  const distanceToLOC = latitude && longitude ? calculateDistanceToLOC(latitude, longitude) : null;
-  const nearestSafeZone = latitude && longitude && safeZones ? 
-    findNearest(latitude, longitude, safeZones.map((zone: any) => ({ 
-      lat: zone.latitude, 
-      lng: zone.longitude, 
-      ...zone 
-    }))) : null;
+  // Calculate distance to border areas if location is available
+  const calculateDistanceToBorder = (lat: number, lng: number) => {
+    // Calculate distance to Line of Control (Kashmir region)
+    const borderLat = 34.0837;
+    const borderLng = 74.7973;
+    const R = 6371; // Earth's radius in km
+    const dLat = (borderLat - lat) * Math.PI / 180;
+    const dLng = (borderLng - lng) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat * Math.PI / 180) * Math.cos(borderLat * Math.PI / 180) *
+      Math.sin(dLng/2) * Math.sin(dLng/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  };
+
+  const distanceToLOC = activeLocation ? calculateDistanceToBorder(activeLocation.lat, activeLocation.lng) : null;
+  const nearestSafeZone = safeZones && Array.isArray(safeZones) && safeZones.length > 0 ? safeZones[0] : null;
 
   const handleEmergencyCall = () => {
     toast({
@@ -158,7 +178,7 @@ export function QuickActions() {
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-600 dark:text-gray-400">Nearest Safe Zone</span>
             <span className="text-sm font-semibold text-gray-900 dark:text-white">
-              {nearestSafeZone ? formatDistance(nearestSafeZone.distance) : "Unknown"}
+              {nearestSafeZone ? nearestSafeZone.name || "Available" : "Unknown"}
             </span>
           </div>
           <div className="flex items-center justify-between">
