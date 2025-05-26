@@ -137,8 +137,8 @@ export async function fetchSecurityAlerts(): Promise<NewsAlert[]> {
   return alerts;
 }
 
-// Generate threat prediction based on recent alerts
-export async function generateThreatPrediction(): Promise<ThreatPrediction> {
+// Generate threat prediction based on recent alerts and location
+export async function generateThreatPrediction(userLat?: number, userLng?: number): Promise<ThreatPrediction> {
   try {
     const recentAlerts = await fetchSecurityAlerts();
     
@@ -151,17 +151,39 @@ export async function generateThreatPrediction(): Promise<ThreatPrediction> {
     let confidence = 0.6;
     let patternConfidence = 0.5;
     
+    // Location-based threat assessment
+    if (userLat && userLng) {
+      const distanceFromBorder = calculateHaversineDistance(userLat, userLng, 34.0837, 74.7973); // Distance to nearest LOC point
+      
+      // Adjust threat level based on proximity to border
+      if (distanceFromBorder < 5) { // Within 5km of border
+        threatLevel = 'high';
+        confidence = Math.max(confidence, 0.8);
+      } else if (distanceFromBorder < 15) { // Within 15km of border
+        threatLevel = 'medium';  
+        confidence = Math.max(confidence, 0.7);
+      } else if (distanceFromBorder < 50) { // Within 50km of border
+        threatLevel = 'low';
+        confidence = Math.max(confidence, 0.6);
+      } else {
+        // Far from border areas - very low threat
+        threatLevel = 'low';
+        confidence = 0.5;
+      }
+    }
+    
+    // Alert-based assessment (combines with location assessment)
     if (emergencyCount > 0) {
       threatLevel = 'critical';
       confidence = 0.9;
       patternConfidence = 0.8;
     } else if (alertCount > 1) {
-      threatLevel = 'high';
-      confidence = 0.8;
+      threatLevel = threatLevel === 'low' ? 'high' : threatLevel;
+      confidence = Math.max(confidence, 0.8);
       patternConfidence = 0.7;
     } else if (alertCount > 0 || warningCount > 2) {
-      threatLevel = 'medium';
-      confidence = 0.7;
+      threatLevel = threatLevel === 'low' ? 'medium' : threatLevel;
+      confidence = Math.max(confidence, 0.7);
       patternConfidence = 0.6;
     }
     
@@ -220,6 +242,43 @@ export async function generateThreatPrediction(): Promise<ThreatPrediction> {
       recommendations: ['Check official government sources for updates', 'Follow standard security protocols']
     };
   }
+}
+
+// Calculate distance from border (Line of Control)
+function calculateDistanceFromBorder(userLat: number, userLng: number): number {
+  // LOC reference points
+  const locPoints = [
+    { lat: 34.0837, lng: 74.7973 }, // Kashmir Sector
+    { lat: 33.7782, lng: 75.3412 }, // Jammu Sector
+    { lat: 34.5194, lng: 74.3119 }, // Srinagar Sector
+    { lat: 32.7767, lng: 74.9014 }  // Central Kashmir
+  ];
+  
+  let minDistance = Infinity;
+  
+  for (const point of locPoints) {
+    const distance = calculateHaversineDistance(userLat, userLng, point.lat, point.lng);
+    if (distance < minDistance) {
+      minDistance = distance;
+    }
+  }
+  
+  return minDistance;
+}
+
+// Haversine formula for distance calculation
+function calculateHaversineDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371; // Earth's radius in kilometers
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  
+  const a = 
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
 }
 
 // Convert news alerts to app alert format
