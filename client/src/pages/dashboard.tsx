@@ -8,6 +8,7 @@ import { ReportingForm } from "@/components/reporting-form";
 import { EducationCenter } from "@/components/education-center";
 import { CommunicationCenter } from "@/components/communication-center";
 import { MobileNavigation } from "@/components/mobile-navigation";
+import { LocationTracker } from "@/components/location-tracker";
 import { useWebSocket } from "@/hooks/use-websocket";
 import { useToast } from "@/hooks/use-toast";
 
@@ -44,8 +45,9 @@ export default function Dashboard() {
           <div className="lg:col-span-2">
             <RealtimeAlerts />
           </div>
-          <div>
+          <div className="space-y-8">
             <QuickActions />
+            <LocationTracker />
           </div>
         </div>
         

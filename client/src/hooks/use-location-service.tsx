@@ -48,8 +48,12 @@ export function useLocationService(options: UseLocationServiceOptions = {}) {
   // Send location to server
   const transmitLocation = useCallback(async (lat: number, lng: number, accuracy?: number) => {
     try {
-      await apiRequest("/api/location/update", {
+      const response = await fetch("/api/location/update", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-session-id": crypto.randomUUID(),
+        },
         body: JSON.stringify({
           latitude: lat,
           longitude: lng,
@@ -57,6 +61,10 @@ export function useLocationService(options: UseLocationServiceOptions = {}) {
           timestamp: new Date().toISOString(),
         }),
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
       setServiceState(prev => ({
         ...prev,
