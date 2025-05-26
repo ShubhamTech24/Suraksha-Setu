@@ -54,18 +54,19 @@ export default function Dashboard() {
 
         <DashboardStats />
         
-        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
-          <div className="xl:col-span-3 space-y-8">
-            <RealtimeAlerts />
-          </div>
-          <div className="space-y-6">
-            <LocationSelector 
-              onLocationChange={setSelectedLocation}
-              currentLocation={selectedLocation}
-            />
-            <QuickActions />
-            <NetworkStatusMonitor />
-          </div>
+        {/* Three components in horizontal layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <QuickActions />
+          <LocationSelector 
+            onLocationChange={setSelectedLocation}
+            currentLocation={selectedLocation}
+          />
+          <NetworkStatusMonitor />
+        </div>
+
+        {/* Alerts section takes full width */}
+        <div className="mb-8">
+          <RealtimeAlerts />
         </div>
         
         <div className="mt-8">
