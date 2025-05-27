@@ -122,7 +122,8 @@ export function DashboardEmergencyCommunication() {
     sendMessageMutation.mutate({
       message: messageInput,
       messageType: 'emergency_communication',
-      receiverId: 1, // Control room ID
+      senderId: user?.id || 1,
+      receiverId: undefined, // Broadcast to control room
     });
   };
 

@@ -479,15 +479,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Chat endpoint for civilians to send emergency messages
-  app.post("/api/chat", async (req, res) => {
+  app.post("/api/chat/send", async (req, res) => {
     try {
-      const { message, senderId, messageType = 'emergency' } = req.body;
+      const { message, senderId, receiverId, messageType = 'emergency_communication' } = req.body;
       
       const newMessage = await storage.createChatMessage({
-        senderId,
+        senderId: senderId || 1, // Default to user ID 1 if not provided
+        receiverId: receiverId || null,
         message,
-        messageType,
-        isRead: false
+        messageType
       });
       
       // Broadcast emergency message to all connected clients (especially admins)
@@ -498,7 +498,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(newMessage);
     } catch (error) {
+      console.error('Chat send error:', error);
       res.status(500).json({ message: "Failed to send emergency message" });
+    }
+  });
+
+  // Get emergency chat messages
+  app.get("/api/chat/emergency", async (req, res) => {
+    try {
+      const messages = await storage.getChatMessages();
+      res.json(messages);
+    } catch (error) {
+      console.error('Get emergency chat error:', error);
+      res.status(500).json({ message: "Failed to get messages" });
     }
   });
 
