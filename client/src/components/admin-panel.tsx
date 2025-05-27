@@ -49,13 +49,13 @@ export function AdminPanel() {
   const { logout, user } = useAuth();
 
   // Fetch all reports for admin review
-  const { data: reports = [], isLoading: reportsLoading } = useQuery({
+  const { data: reports = [], isLoading: reportsLoading } = useQuery<Report[]>({
     queryKey: ['/api/admin/reports'],
     refetchInterval: 30000, // Refresh every 30 seconds
   });
 
   // Fetch chat messages
-  const { data: chatMessages = [], isLoading: chatLoading } = useQuery({
+  const { data: chatMessages = [], isLoading: chatLoading } = useQuery<ChatMessage[]>({
     queryKey: ['/api/admin/chat'],
     refetchInterval: 10000, // Refresh every 10 seconds
   });
@@ -98,6 +98,7 @@ export function AdminPanel() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/chat'] });
       setChatMessage("");
+      setReplyToMessage(null);
       toast({ title: "Message sent successfully" });
     },
   });
@@ -111,9 +112,12 @@ export function AdminPanel() {
   };
 
   const handleSendMessage = () => {
-    if (chatMessage.trim()) {
-      sendMessageMutation.mutate({ message: chatMessage });
-    }
+    if (!chatMessage.trim()) return;
+    
+    sendMessageMutation.mutate({
+      message: chatMessage,
+      receiverId: replyToMessage?.senderId // Reply to the original sender
+    });
   };
 
   const getStatusBadge = (status: string) => {
@@ -153,13 +157,33 @@ export function AdminPanel() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-slate-900 p-6">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Admin Command Center
-          </h1>
-          <p className="text-gray-600 dark:text-gray-300 mt-2">
-            Manage security reports and communicate with field personnel
-          </p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Admin Command Center
+            </h1>
+            <p className="text-gray-600 dark:text-gray-300 mt-2">
+              Manage security reports and communicate with field personnel
+            </p>
+          </div>
+          <div className="flex items-center space-x-4">
+            <div className="text-right">
+              <p className="text-sm font-medium text-gray-900 dark:text-white">
+                Welcome, {user?.fullName || 'Admin'}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {user?.role === 'admin' ? 'System Administrator' : 'User'}
+              </p>
+            </div>
+            <Button
+              onClick={logout}
+              variant="outline"
+              className="flex items-center space-x-2 hover:bg-red-50 hover:border-red-300 hover:text-red-700"
+            >
+              <LogOut size={16} />
+              <span>Logout</span>
+            </Button>
+          </div>
         </div>
 
         <Tabs defaultValue="reports" className="space-y-6">
@@ -329,26 +353,53 @@ export function AdminPanel() {
                       </div>
                     ) : (
                       <div className="space-y-4">
-                        {chatMessages.map((message: ChatMessage) => (
+                        {(chatMessages as ChatMessage[]).map((message: ChatMessage) => (
                           <div
                             key={message.id}
                             className={`flex ${
                               message.senderId === 1 ? 'justify-end' : 'justify-start'
                             }`}
                           >
-                            <div
-                              className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                                message.senderId === 1
-                                  ? 'bg-blue-600 text-white'
-                                  : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white'
-                              }`}
-                            >
-                              <p className="text-sm">{message.message}</p>
-                              <p className={`text-xs mt-1 ${
-                                message.senderId === 1 ? 'text-blue-100' : 'text-gray-500'
-                              }`}>
-                                {new Date(message.createdAt).toLocaleTimeString()}
-                              </p>
+                            <div className="flex flex-col max-w-xs lg:max-w-md">
+                              {message.senderId !== 1 && (
+                                <div className="flex items-center space-x-2 mb-1">
+                                  <User size={14} className="text-red-500" />
+                                  <span className="text-xs font-medium text-red-600 dark:text-red-400">
+                                    CIVILIAN EMERGENCY
+                                  </span>
+                                  {message.messageType === 'emergency' && (
+                                    <Badge className="bg-red-100 text-red-800 text-xs px-1 py-0">
+                                      URGENT
+                                    </Badge>
+                                  )}
+                                </div>
+                              )}
+                              <div
+                                className={`px-4 py-2 rounded-lg ${
+                                  message.senderId === 1
+                                    ? 'bg-blue-600 text-white'
+                                    : 'bg-red-50 dark:bg-red-900/30 text-gray-900 dark:text-white border-l-4 border-red-500'
+                                }`}
+                              >
+                                <p className="text-sm">{message.message}</p>
+                                <div className="flex justify-between items-center mt-1">
+                                  <p className={`text-xs ${
+                                    message.senderId === 1 ? 'text-blue-100' : 'text-gray-500'
+                                  }`}>
+                                    {new Date(message.createdAt).toLocaleTimeString()}
+                                  </p>
+                                  {message.senderId !== 1 && (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => setReplyToMessage(message)}
+                                      className="text-xs px-2 py-1 h-6"
+                                    >
+                                      Reply
+                                    </Button>
+                                  )}
+                                </div>
+                              </div>
                             </div>
                           </div>
                         ))}
@@ -356,10 +407,34 @@ export function AdminPanel() {
                     )}
                   </div>
 
+                  {/* Reply Context */}
+                  {replyToMessage && (
+                    <div className="bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-400 p-3 rounded">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                            Replying to civilian emergency message:
+                          </p>
+                          <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
+                            "{replyToMessage.message}"
+                          </p>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setReplyToMessage(null)}
+                          className="text-yellow-600 hover:text-yellow-800"
+                        >
+                          ×
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Message Input */}
                   <div className="flex space-x-2">
                     <Textarea
-                      placeholder="Type emergency response message..."
+                      placeholder={replyToMessage ? "Type your response to the civilian..." : "Type emergency response message..."}
                       value={chatMessage}
                       onChange={(e) => setChatMessage(e.target.value)}
                       className="flex-1"
@@ -376,6 +451,9 @@ export function AdminPanel() {
                       className="bg-blue-600 hover:bg-blue-700"
                     >
                       <Send size={16} />
+                      {sendMessageMutation.isPending && (
+                        <div className="ml-2 animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      )}
                     </Button>
                   </div>
                 </div>
