@@ -1,5 +1,6 @@
-// Free news and alert monitoring service
-// Uses NewsAPI.org free tier (no API key needed for development)
+// Real news and alert monitoring service
+// Uses free RSS feeds and public sources for authentic threat assessment
+import { getRealThreatAssessment } from "./real-threat-api";
 
 interface NewsAlert {
   title: string;
@@ -140,7 +141,8 @@ export async function fetchSecurityAlerts(): Promise<NewsAlert[]> {
 // Generate threat prediction based on recent alerts and location
 export async function generateThreatPrediction(userLat?: number, userLng?: number): Promise<ThreatPrediction> {
   try {
-    const recentAlerts = await fetchSecurityAlerts();
+    // Get real threat assessment from authentic news sources
+    const realAssessment = await getRealThreatAssessment(userLat, userLng);
     
     // Analyze patterns in recent alerts
     const emergencyCount = recentAlerts.filter(a => a.severity === 'emergency').length;
