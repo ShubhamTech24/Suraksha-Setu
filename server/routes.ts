@@ -70,6 +70,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   }
 
+  // Authentication routes
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { username, password, role } = req.body;
+
+      if (!username || !password) {
+        return res.status(400).json({ message: "Username and password are required" });
+      }
+
+      const user = await storage.getUserByUsername(username);
+      if (!user) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+
+      // Simple password check (in production, use proper hashing)
+      if (user.password !== password) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+
+      // Check if role matches
+      if (role && user.role !== role) {
+        return res.status(401).json({ message: "Invalid role for this account" });
+      }
+
+      // Return user data (excluding password)
+      const { password: _, ...userWithoutPassword } = user;
+      res.json({
+        success: true,
+        user: userWithoutPassword,
+        message: "Login successful"
+      });
+    } catch (error) {
+      console.error("Login error:", error);
+      res.status(500).json({ message: "Login failed" });
+    }
+  });
+
+  app.post("/api/auth/signup", async (req, res) => {
+    try {
+      const { username, password, fullName, phoneNumber, location, role } = req.body;
+
+      if (!username || !password || !fullName) {
+        return res.status(400).json({ message: "Username, password, and full name are required" });
+      }
+
+      // Check if user already exists
+      const existingUser = await storage.getUserByUsername(username);
+      if (existingUser) {
+        return res.status(409).json({ message: "Username already exists" });
+      }
+
+      // Create new user
+      const newUser = await storage.createUser({
+        username,
+        password, // In production, hash this password
+        fullName,
+        phoneNumber,
+        location,
+        role: role || 'user'
+      });
+
+      // Return user data (excluding password)
+      const { password: _, ...userWithoutPassword } = newUser;
+      res.json({
+        success: true,
+        user: userWithoutPassword,
+        message: "Account created successfully"
+      });
+    } catch (error) {
+      console.error("Signup error:", error);
+      res.status(500).json({ message: "Account creation failed" });
+    }
+  });
+
   // Dashboard statistics
   app.get("/api/dashboard/stats", async (req, res) => {
     try {
