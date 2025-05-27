@@ -74,8 +74,8 @@ export function Login({ onLoginSuccess }: LoginProps) {
 
   const handleQuickLogin = (role: 'user' | 'admin') => {
     const quickCredentials = role === 'admin' 
-      ? { username: 'admin', password: 'admin123', role: 'admin' as const }
-      : { username: 'user', password: 'user123', role: 'user' as const };
+      ? { username: 'demo_admin', password: 'admin123', role: 'admin' as const }
+      : { username: 'demo_user', password: 'password123', role: 'user' as const };
     
     setCredentials(quickCredentials);
     loginMutation.mutate(quickCredentials);
