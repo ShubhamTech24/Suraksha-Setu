@@ -77,6 +77,8 @@ export const educationResources = pgTable("education_resources", {
   type: text("type").notNull(), // 'article', 'video', 'interactive', 'guide'
   category: text("category").notNull(), // 'drone_response', 'evacuation', 'cyber_safety', 'first_aid'
   content: text("content"), // Article content or video URL
+  videoUrl: text("video_url"), // YouTube video URL
+  thumbnailUrl: text("thumbnail_url"), // Video thumbnail
   duration: integer("duration"), // Reading time in minutes or video duration
   priority: text("priority").notNull().default("medium"), // 'low', 'medium', 'high', 'essential'
   isPublished: boolean("is_published").default(true),
