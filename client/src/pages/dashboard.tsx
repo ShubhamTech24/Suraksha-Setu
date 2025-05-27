@@ -5,8 +5,8 @@ import { RealtimeAlerts } from "@/components/realtime-alerts";
 import { QuickActions } from "@/components/quick-actions";
 import { InteractiveThreatMap } from "@/components/interactive-threat-map";
 import { ReportingForm } from "@/components/reporting-form";
-import { AdvancedEducationCenter } from "@/components/advanced-education-center";
-import { CommunicationCenter } from "@/components/communication-center";
+import { DashboardSafetyEducation } from "@/components/dashboard-safety-education";
+import { DashboardEmergencyCommunication } from "@/components/dashboard-emergency-communication";
 import { MobileNavigation } from "@/components/mobile-navigation";
 import { NetworkStatusMonitor } from "@/components/network-status";
 import { LocationSelector } from "@/components/location-selector";
@@ -73,13 +73,15 @@ export default function Dashboard() {
           <InteractiveThreatMap />
         </div>
         
-        <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Three column layout for main dashboard cards */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           <ReportingForm />
-          <AdvancedEducationCenter />
+          <DashboardSafetyEducation />
         </div>
         
+        {/* Emergency Communication spans full width */}
         <div className="mt-8">
-          <CommunicationCenter />
+          <DashboardEmergencyCommunication />
         </div>
       </main>
       
