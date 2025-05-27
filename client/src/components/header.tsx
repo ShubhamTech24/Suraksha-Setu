@@ -1,17 +1,25 @@
-import { Shield, Menu, Phone, Moon, Sun, User, Bell, Activity, Zap } from "lucide-react";
+import { Shield, Menu, Phone, Moon, Sun, User, Bell, Activity, Zap, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/theme-provider";
 import { Link, useLocation } from "wouter";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/components/auth-context";
 import {
   Sheet,
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function Header() {
   const { theme, toggleTheme } = useTheme();
   const [location] = useLocation();
+  const { user, logout, isAdmin } = useAuth();
 
   const navigation = [
     { name: "Command Center", href: "/", icon: Activity },
@@ -112,16 +120,52 @@ export function Header() {
               )}
             </Button>
 
-            {/* Profile Avatar */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="relative overflow-hidden hover:bg-white/80 dark:hover:bg-gray-700/80 transition-all duration-300 hover:scale-110"
-            >
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                <User size={16} className="text-white" />
-              </div>
-            </Button>
+            {/* User Profile Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="relative overflow-hidden hover:bg-white/80 dark:hover:bg-gray-700/80 transition-all duration-300 hover:scale-110"
+                >
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                    <User size={16} className="text-white" />
+                  </div>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <div className="px-3 py-2 border-b">
+                  <p className="text-sm font-medium">{user?.fullName}</p>
+                  <p className="text-xs text-gray-500">
+                    {isAdmin ? 'Security Admin' : 'Civilian User'}
+                  </p>
+                </div>
+                {isAdmin && (
+                  <DropdownMenuItem asChild>
+                    <Link href="/admin" className="w-full cursor-pointer">
+                      <Shield size={16} className="mr-2" />
+                      Admin Panel
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem asChild>
+                  <Link href="/" className="w-full cursor-pointer">
+                    <Activity size={16} className="mr-2" />
+                    Dashboard
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => {
+                    logout();
+                    window.location.href = '/login';
+                  }}
+                  className="text-red-600 cursor-pointer"
+                >
+                  <LogOut size={16} className="mr-2" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             {/* Mobile Menu */}
             <Sheet>
