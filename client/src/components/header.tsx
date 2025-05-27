@@ -26,6 +26,7 @@ export function Header() {
     { name: "Live Alerts", href: "/alerts", icon: Bell },
     { name: "Intel Reports", href: "/reports", icon: Zap },
     { name: "Safe Zones", href: "/safety", icon: Shield },
+    { name: "Safety Center", href: "/safety-center", icon: User },
     { name: "Training Hub", href: "/education", icon: User },
   ];
 

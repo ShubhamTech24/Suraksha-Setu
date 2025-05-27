@@ -45,6 +45,7 @@ function ProtectedRoute({ component: Component, adminOnly = false }: { component
 
 function AuthenticatedRouter() {
   const { isAuthenticated, loading } = useAuth();
+  const [, setLocation] = useLocation();
 
   if (loading) {
     return (
