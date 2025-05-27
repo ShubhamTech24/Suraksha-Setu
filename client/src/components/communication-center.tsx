@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Phone, Shield, ShieldX, Ambulance, MessageSquare, Send, Lock, User } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { API_ENDPOINTS } from "@/lib/constants";
 import { useWebSocket } from "@/hooks/use-websocket";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "./auth-context";
 
 interface EmergencyContact {
   id: number;
@@ -28,6 +29,8 @@ interface Message {
 
 export function CommunicationCenter() {
   const { toast } = useToast();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [messageInput, setMessageInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -48,6 +51,37 @@ export function CommunicationCenter() {
 
   const { data: emergencyContacts } = useQuery({
     queryKey: [API_ENDPOINTS.EMERGENCY_CONTACTS],
+  });
+
+  // Send emergency message mutation
+  const sendEmergencyMessage = useMutation({
+    mutationFn: async (message: string) => {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message,
+          senderId: user?.id || 2, // Use current user ID or default civilian ID
+          messageType: 'emergency'
+        }),
+      });
+      if (!response.ok) throw new Error('Failed to send emergency message');
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Emergency Message Sent",
+        description: "Your emergency message has been sent to the control center",
+        variant: "destructive"
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Failed to send message",
+        description: "Please try again or use emergency call",
+        variant: "destructive"
+      });
+    }
   });
 
   useWebSocket({
@@ -109,6 +143,10 @@ export function CommunicationCenter() {
   const sendMessage = () => {
     if (!messageInput.trim()) return;
 
+    // Send emergency message to admin dashboard
+    sendEmergencyMessage.mutate(messageInput);
+
+    // Also add to local messages for immediate feedback
     const newMessage: Message = {
       id: Date.now().toString(),
       sender: 'user',
@@ -119,11 +157,6 @@ export function CommunicationCenter() {
 
     setMessages(prev => [newMessage, ...prev]);
     setMessageInput("");
-    
-    toast({
-      title: "Message Sent",
-      description: "Your secure message has been delivered",
-    });
   };
 
   const formatTime = (timestamp: string) => {
