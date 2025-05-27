@@ -5,7 +5,7 @@ import { RealtimeAlerts } from "@/components/realtime-alerts";
 import { QuickActions } from "@/components/quick-actions";
 import { InteractiveThreatMap } from "@/components/interactive-threat-map";
 import { ReportingForm } from "@/components/reporting-form";
-import { EducationCenter } from "@/components/education-center";
+import { AdvancedEducationCenter } from "@/components/advanced-education-center";
 import { CommunicationCenter } from "@/components/communication-center";
 import { MobileNavigation } from "@/components/mobile-navigation";
 import { NetworkStatusMonitor } from "@/components/network-status";
@@ -75,7 +75,7 @@ export default function Dashboard() {
         
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
           <ReportingForm />
-          <EducationCenter />
+          <AdvancedEducationCenter />
         </div>
         
         <div className="mt-8">

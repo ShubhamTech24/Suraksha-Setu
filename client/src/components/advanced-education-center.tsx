@@ -22,70 +22,70 @@ interface EducationResource {
   priority: 'low' | 'medium' | 'high' | 'essential';
 }
 
-const safetyEducationData = [
+const safetyEducationData: EducationResource[] = [
   {
     id: 1,
     title: "Emergency Evacuation Procedures",
     description: "Complete guide on how to safely evacuate during emergencies",
-    type: "video",
+    type: "video" as const,
     category: "evacuation",
     videoUrl: "https://www.youtube.com/embed/kFjjONGLzV4",
     thumbnailUrl: "https://img.youtube.com/vi/kFjjONGLzV4/maxresdefault.jpg",
     duration: 8,
-    priority: "essential"
+    priority: "essential" as const
   },
   {
     id: 2,
     title: "First Aid Basics for Border Areas",
     description: "Essential first aid techniques for emergency situations",
-    type: "video",
+    type: "video" as const,
     category: "first_aid",
     videoUrl: "https://www.youtube.com/embed/7RRn9MmxCbw",
     thumbnailUrl: "https://img.youtube.com/vi/7RRn9MmxCbw/maxresdefault.jpg",
     duration: 12,
-    priority: "essential"
+    priority: "essential" as const
   },
   {
     id: 3,
     title: "Cyber Security for Citizens",
     description: "Protect yourself from cyber threats and digital attacks",
-    type: "video",
+    type: "video" as const,
     category: "cyber_safety",
     videoUrl: "https://www.youtube.com/embed/inWWhr5tnEA",
     thumbnailUrl: "https://img.youtube.com/vi/inWWhr5tnEA/maxresdefault.jpg",
     duration: 15,
-    priority: "high"
+    priority: "high" as const
   },
   {
     id: 4,
     title: "Drone Threat Recognition",
     description: "Learn to identify and respond to drone-related security threats",
-    type: "video",
+    type: "video" as const,
     category: "drone_response",
     videoUrl: "https://www.youtube.com/embed/QrGc5eOkLww",
     thumbnailUrl: "https://img.youtube.com/vi/QrGc5eOkLww/maxresdefault.jpg",
     duration: 10,
-    priority: "high"
+    priority: "high" as const
   },
   {
     id: 5,
     title: "Building Emergency Kit",
     description: "Essential items every family should have for emergencies",
-    type: "guide",
+    type: "guide" as const,
     category: "preparedness",
     content: "Emergency kit preparation guide with detailed checklist",
     duration: 5,
-    priority: "medium"
+    priority: "medium" as const
   },
   {
     id: 6,
     title: "Communication During Crisis",
     description: "How to maintain communication during emergency situations",
-    type: "article",
+    type: "article" as const,
     category: "communication",
     content: "Complete guide on emergency communication protocols",
     duration: 7,
-    priority: "high"
+    priority: "high" as const
   }
 ];
 
