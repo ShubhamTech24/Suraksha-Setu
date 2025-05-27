@@ -15,6 +15,7 @@ import Alerts from "@/pages/alerts";
 import Reports from "@/pages/reports";
 import SafetyZones from "@/pages/safety-zones";
 import Education from "@/pages/education";
+import SafetyCenter from "@/pages/safety-center";
 import { useLocation } from "wouter";
 
 function ProtectedRoute({ component: Component, adminOnly = false }: { component: React.ComponentType; adminOnly?: boolean }) {
@@ -78,6 +79,9 @@ function AuthenticatedRouter() {
       </Route>
       <Route path="/education">
         <ProtectedRoute component={Education} />
+      </Route>
+      <Route path="/safety-center">
+        <ProtectedRoute component={SafetyCenter} />
       </Route>
       <Route component={NotFound} />
     </Switch>

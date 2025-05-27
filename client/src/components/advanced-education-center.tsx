@@ -153,17 +153,17 @@ export function AdvancedEducationCenter() {
   };
 
   const categories = [
-    { id: 'all', name: 'All Categories', count: resources.length },
-    { id: 'evacuation', name: 'Evacuation', count: resources.filter(r => r.category === 'evacuation').length },
-    { id: 'first_aid', name: 'First Aid', count: resources.filter(r => r.category === 'first_aid').length },
-    { id: 'cyber_safety', name: 'Cyber Safety', count: resources.filter(r => r.category === 'cyber_safety').length },
-    { id: 'drone_response', name: 'Drone Response', count: resources.filter(r => r.category === 'drone_response').length },
-    { id: 'preparedness', name: 'Preparedness', count: resources.filter(r => r.category === 'preparedness').length },
+    { id: 'all', name: 'All Categories', count: (resources as EducationResource[]).length },
+    { id: 'evacuation', name: 'Evacuation', count: (resources as EducationResource[]).filter(r => r.category === 'evacuation').length },
+    { id: 'first_aid', name: 'First Aid', count: (resources as EducationResource[]).filter(r => r.category === 'first_aid').length },
+    { id: 'cyber_safety', name: 'Cyber Safety', count: (resources as EducationResource[]).filter(r => r.category === 'cyber_safety').length },
+    { id: 'drone_response', name: 'Drone Response', count: (resources as EducationResource[]).filter(r => r.category === 'drone_response').length },
+    { id: 'preparedness', name: 'Preparedness', count: (resources as EducationResource[]).filter(r => r.category === 'preparedness').length },
   ];
 
   const filteredResources = selectedCategory === 'all' 
-    ? resources 
-    : resources.filter(r => r.category === selectedCategory);
+    ? (resources as EducationResource[])
+    : (resources as EducationResource[]).filter(r => r.category === selectedCategory);
 
   if (isLoading) {
     return (
@@ -214,7 +214,7 @@ export function AdvancedEducationCenter() {
             
             <TabsContent value={selectedCategory} className="mt-6">
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {filteredResources.map((resource) => {
+                {filteredResources.map((resource: EducationResource) => {
                   const Icon = getResourceIcon(resource.type);
                   const colorClass = getResourceColor(resource.category);
                   
