@@ -478,6 +478,99 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Chat endpoint for civilians to send emergency messages
+  app.post("/api/chat", async (req, res) => {
+    try {
+      const { message, senderId, messageType = 'emergency' } = req.body;
+      
+      const newMessage = await storage.createChatMessage({
+        senderId,
+        message,
+        messageType,
+        isRead: false
+      });
+      
+      // Broadcast emergency message to all connected clients (especially admins)
+      broadcast({
+        type: 'emergency_message',
+        data: newMessage
+      });
+      
+      res.json(newMessage);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to send emergency message" });
+    }
+  });
+
+  // Admin routes for managing reports and chat
+  app.get("/api/admin/reports", async (req, res) => {
+    try {
+      const reports = await storage.getReports();
+      res.json(reports);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get reports" });
+    }
+  });
+
+  app.patch("/api/admin/reports/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status, adminComment } = req.body;
+      
+      const updatedReport = await storage.updateReport(parseInt(id), {
+        status,
+        adminComment
+      });
+      
+      if (!updatedReport) {
+        return res.status(404).json({ message: "Report not found" });
+      }
+      
+      // Broadcast update to all connected clients
+      broadcast({
+        type: 'report_updated',
+        data: updatedReport
+      });
+      
+      res.json(updatedReport);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update report" });
+    }
+  });
+
+  app.get("/api/admin/chat", async (req, res) => {
+    try {
+      const messages = await storage.getChatMessages();
+      res.json(messages);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get chat messages" });
+    }
+  });
+
+  app.post("/api/admin/chat", async (req, res) => {
+    try {
+      const { message, receiverId, senderId, messageType = 'text' } = req.body;
+      
+      const newMessage = await storage.createChatMessage({
+        senderId: senderId || 1, // Default admin ID
+        receiverId,
+        message,
+        messageType,
+        isRead: false
+      });
+      
+      // Broadcast message to all connected clients
+      broadcast({
+        type: 'new_message',
+        data: newMessage
+      });
+      
+      res.json(newMessage);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to send message" });
+    }
+  });
+
   // Health check endpoint
   app.get("/api/health", (req, res) => {
     res.json({

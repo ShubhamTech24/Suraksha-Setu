@@ -41,6 +41,7 @@ export const reports = pgTable("reports", {
   status: text("status").notNull().default("pending"), // 'pending', 'verified', 'rejected', 'investigating'
   aiAnalysis: jsonb("ai_analysis"), // AI analysis results
   verifiedBy: integer("verified_by").references(() => users.id),
+  adminComment: text("admin_comment"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
