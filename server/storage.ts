@@ -1,8 +1,9 @@
 import { 
-  users, threats, reports, safeZones, alerts, educationResources, emergencyContacts,
+  users, threats, reports, safeZones, alerts, educationResources, emergencyContacts, chatMessages, reportComments,
   type User, type InsertUser, type Threat, type InsertThreat, type Report, type InsertReport,
   type SafeZone, type InsertSafeZone, type Alert, type InsertAlert,
-  type EducationResource, type InsertEducationResource, type EmergencyContact, type InsertEmergencyContact
+  type EducationResource, type InsertEducationResource, type EmergencyContact, type InsertEmergencyContact,
+  type ChatMessage, type InsertChatMessage, type ReportComment, type InsertReportComment
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, sql, or, lt, gt } from "drizzle-orm";

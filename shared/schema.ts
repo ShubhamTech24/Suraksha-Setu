@@ -9,6 +9,7 @@ export const users = pgTable("users", {
   fullName: text("full_name").notNull(),
   phoneNumber: text("phone_number"),
   location: text("location"),
+  role: text("role").notNull().default("user"), // 'admin', 'user'
   isVerified: boolean("is_verified").default(false),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -91,6 +92,26 @@ export const emergencyContacts = pgTable("emergency_contacts", {
   priority: integer("priority").default(1),
 });
 
+export const chatMessages = pgTable("chat_messages", {
+  id: serial("id").primaryKey(),
+  senderId: integer("sender_id").notNull().references(() => users.id),
+  receiverId: integer("receiver_id").references(() => users.id), // null for broadcast messages
+  message: text("message").notNull(),
+  messageType: text("message_type").notNull().default("text"), // 'text', 'emergency', 'alert', 'file'
+  isRead: boolean("is_read").default(false),
+  metadata: jsonb("metadata"), // Additional message data like file info
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const reportComments = pgTable("report_comments", {
+  id: serial("id").primaryKey(),
+  reportId: integer("report_id").notNull().references(() => reports.id),
+  userId: integer("user_id").notNull().references(() => users.id),
+  comment: text("comment").notNull(),
+  isAdminResponse: boolean("is_admin_response").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -156,6 +177,21 @@ export const insertEmergencyContactSchema = createInsertSchema(emergencyContacts
   priority: true,
 });
 
+export const insertChatMessageSchema = createInsertSchema(chatMessages).pick({
+  senderId: true,
+  receiverId: true,
+  message: true,
+  messageType: true,
+  metadata: true,
+});
+
+export const insertReportCommentSchema = createInsertSchema(reportComments).pick({
+  reportId: true,
+  userId: true,
+  comment: true,
+  isAdminResponse: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -177,3 +213,9 @@ export type InsertEducationResource = z.infer<typeof insertEducationResourceSche
 
 export type EmergencyContact = typeof emergencyContacts.$inferSelect;
 export type InsertEmergencyContact = z.infer<typeof insertEmergencyContactSchema>;
+
+export type ChatMessage = typeof chatMessages.$inferSelect;
+export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
+
+export type ReportComment = typeof reportComments.$inferSelect;
+export type InsertReportComment = z.infer<typeof insertReportCommentSchema>;
