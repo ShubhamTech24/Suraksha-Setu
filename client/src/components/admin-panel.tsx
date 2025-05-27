@@ -12,10 +12,12 @@ import {
   User, 
   Calendar,
   Send,
-  Settings
+  Settings,
+  LogOut
 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "./auth-context";
 
 interface Report {
   id: number;
@@ -41,8 +43,10 @@ export function AdminPanel() {
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [adminResponse, setAdminResponse] = useState("");
   const [chatMessage, setChatMessage] = useState("");
+  const [replyToMessage, setReplyToMessage] = useState<ChatMessage | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { logout, user } = useAuth();
 
   // Fetch all reports for admin review
   const { data: reports = [], isLoading: reportsLoading } = useQuery({
