@@ -7,7 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Shield, User, Lock, Eye, EyeOff, UserCheck, Settings } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
+import { useAuth } from "@/components/auth-context";
 
 interface LoginCredentials {
   username: string;
@@ -27,6 +28,8 @@ export function Login({ onLoginSuccess }: LoginProps) {
     role: 'user'
   });
   const { toast } = useToast();
+  const { login } = useAuth();
+  const [, setLocation] = useLocation();
 
   const loginMutation = useMutation({
     mutationFn: async (data: LoginCredentials) => {
@@ -48,7 +51,13 @@ export function Login({ onLoginSuccess }: LoginProps) {
         title: "Login successful!",
         description: `Welcome ${data.user.fullName}`,
       });
-      onLoginSuccess(data.user);
+      login(data.user);
+      // Redirect based on user role
+      if (data.user.role === 'admin') {
+        window.location.href = '/admin';
+      } else {
+        window.location.href = '/';
+      }
     },
     onError: (error: Error) => {
       toast({
