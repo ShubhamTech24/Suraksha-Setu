@@ -138,110 +138,78 @@ export async function fetchSecurityAlerts(): Promise<NewsAlert[]> {
   return alerts;
 }
 
-// Generate threat prediction based on recent alerts and location
+// Generate threat prediction based on real news sources and location
 export async function generateThreatPrediction(userLat?: number, userLng?: number): Promise<ThreatPrediction> {
   try {
     // Get real threat assessment from authentic news sources
     const realAssessment = await getRealThreatAssessment(userLat, userLng);
+    console.log('Real threat assessment result:', realAssessment);
     
-    // Analyze patterns in recent alerts
-    const emergencyCount = recentAlerts.filter(a => a.severity === 'emergency').length;
-    const alertCount = recentAlerts.filter(a => a.severity === 'alert').length;
-    const warningCount = recentAlerts.filter(a => a.severity === 'warning').length;
-    
-    let threatLevel = 'low';
-    let confidence = 0.6;
-    let patternConfidence = 0.5;
+    // Use real assessment data instead of fake alerts
+    const threatLevel = realAssessment.threatLevel;
+    const confidence = realAssessment.confidence;
+    let patternConfidence = confidence * 0.8;
     
     const riskFactors: string[] = [];
     const recommendations: string[] = [];
     
-    // Location-based threat assessment
+    // Add location-specific factors if user location is provided
     if (userLat && userLng) {
       const distanceFromBorder = calculateDistanceFromBorder(userLat, userLng);
       
-      // Adjust threat level based on proximity to border and current tensions
-      if (distanceFromBorder < 2) { // Within 2km of border - immediate border area
-        threatLevel = 'high';
-        confidence = Math.max(confidence, 0.9);
-        riskFactors.push('Located in immediate border zone');
-      } else if (distanceFromBorder < 10) { // Within 10km of border
-        threatLevel = 'medium';  
-        confidence = Math.max(confidence, 0.8);
-        riskFactors.push('Located near border area');
-      } else if (distanceFromBorder < 25) { // Within 25km of border
-        threatLevel = 'low';
-        confidence = Math.max(confidence, 0.7);
-        riskFactors.push('Located in border district');
-      } else if (distanceFromBorder < 100) { // Within 100km of border
-        threatLevel = 'low';
-        confidence = Math.max(confidence, 0.6);
-      } else {
-        // Far from border areas - very low threat
-        threatLevel = 'low';
-        confidence = 0.4;
-      }
-      
-      // Add location-specific recommendations
-      if (distanceFromBorder < 10) {
+      if (distanceFromBorder < 50) {
+        riskFactors.push('Located near international border');
         recommendations.push('Stay alert for unusual activities');
         recommendations.push('Keep emergency contacts ready');
+        patternConfidence = Math.min(patternConfidence + 0.1, 1.0);
       }
-      if (distanceFromBorder < 2) {
-        recommendations.push('Avoid unnecessary travel near fence line');
-        recommendations.push('Report any suspicious movements immediately');
+      
+      if (distanceFromBorder < 10) {
+        riskFactors.push('Located in border zone');
+        recommendations.push('Monitor official border security updates');
       }
-    } else {
-      // No location data - use general assessment
-      threatLevel = 'low';
-      confidence = 0.5;
-      riskFactors.push('Location data unavailable');
-      recommendations.push('Enable location services for region-specific updates');
     }
     
-    // Alert-based assessment (combines with location assessment)
-    if (emergencyCount > 0) {
-      threatLevel = 'critical';
-      confidence = 0.9;
-      patternConfidence = 0.8;
-    } else if (alertCount > 1) {
-      threatLevel = threatLevel === 'low' ? 'high' : threatLevel;
-      confidence = Math.max(confidence, 0.8);
-      patternConfidence = 0.7;
-    } else if (alertCount > 0 || warningCount > 2) {
-      threatLevel = threatLevel === 'low' ? 'medium' : threatLevel;
-      confidence = Math.max(confidence, 0.7);
-      patternConfidence = 0.6;
+    // Add recommendations based on real threat level
+    switch (threatLevel) {
+      case 'critical':
+        recommendations.push('Follow emergency protocols immediately');
+        recommendations.push('Contact authorities if safe to do so');
+        recommendations.push('Avoid all non-essential travel');
+        riskFactors.push('Critical security situation detected from news sources');
+        break;
+      case 'high':
+        recommendations.push('Increase security awareness');
+        recommendations.push('Monitor official communications');
+        recommendations.push('Prepare emergency supplies');
+        riskFactors.push('Elevated security threats identified in news');
+        break;
+      case 'medium':
+        recommendations.push('Maintain heightened awareness');
+        recommendations.push('Stay informed of local situation');
+        recommendations.push('Review emergency procedures');
+        riskFactors.push('Moderate security concerns reported');
+        break;
+      case 'low':
+      default:
+        recommendations.push('Continue normal activities with standard precautions');
+        recommendations.push('Stay informed through reliable sources');
+        riskFactors.push('Normal security conditions');
+        break;
     }
     
-    if (emergencyCount > 0) {
-      riskFactors.push('Active security incidents reported');
-      recommendations.push('Avoid travel to border areas');
-      recommendations.push('Stay informed through official channels');
+    // Add transparency about data sources
+    if (realAssessment.sources.length > 0) {
+      riskFactors.push(`Data sources: ${realAssessment.sources.join(', ')}`);
     }
     
-    if (alertCount > 0) {
-      riskFactors.push('Heightened security activity');
-      recommendations.push('Follow local authority guidelines');
-    }
-    
-    if (warningCount > 0) {
-      riskFactors.push('Multiple warning-level incidents');
-      recommendations.push('Maintain situational awareness');
-    }
-    
-    // Default recommendations
-    if (recommendations.length === 0) {
-      recommendations.push('Continue normal activities with standard precautions');
-      recommendations.push('Stay updated with local news');
-    }
-    
+    // Generate prediction based on current real assessment
     const nextHoursPrediction = threatLevel === 'critical' 
-      ? 'Continued high alert status expected. Monitor official communications closely.'
+      ? 'Continued critical alert status expected. Monitor official communications closely.'
       : threatLevel === 'high'
-      ? 'Security situation may evolve. Stay alert for updates.'
+      ? 'Security situation requires attention. Stay alert for updates.'
       : threatLevel === 'medium'
-      ? 'Situation appears stable but monitoring continues.'
+      ? 'Situation appears stable but continue monitoring.'
       : 'Normal security conditions expected to continue.';
     
     return {

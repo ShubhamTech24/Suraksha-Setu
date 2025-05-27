@@ -62,7 +62,7 @@ async function fetchBBCNews(): Promise<SecurityAlert[]> {
     }
     
     const xmlData = await response.text();
-    const result = await parseXML(xmlData);
+    const result: any = await parseXML(xmlData);
     
     const alerts: SecurityAlert[] = [];
     const items = result.rss?.channel?.[0]?.item || [];
@@ -231,7 +231,7 @@ function calculateLocationThreatLevel(userLat?: number, userLng?: number, alerts
     threatLevel,
     confidence,
     description,
-    sources: [...new Set(alerts.map(a => a.source))],
+    sources: Array.from(new Set(alerts.map(a => a.source))),
     lastUpdated: new Date().toISOString(),
     locationSpecific
   };
