@@ -143,7 +143,7 @@ export function InteractiveThreatMap() {
     queryKey: ['/api/safe-zones'],
   });
 
-  // Generate threat zones based on real data
+  // Generate stable threat zones based on real data
   useEffect(() => {
     const generateThreatZones = () => {
       const zones: ThreatZone[] = [];
@@ -168,14 +168,16 @@ export function InteractiveThreatMap() {
           });
         }
 
-        // Create dynamic threat zones based on alerts
+        // Create stable threat zones based on alerts (using deterministic positions)
         if (alerts && Array.isArray(alerts)) {
           alerts.slice(0, 3).forEach((alert: any, index: number) => {
-            const offsetLat = (Math.random() - 0.5) * 0.2;
-            const offsetLng = (Math.random() - 0.5) * 0.2;
+            // Use deterministic offsets based on alert ID or index to prevent fluctuation
+            const seed = alert.id ? alert.id.toString() : index.toString();
+            const offsetLat = (parseInt(seed, 10) % 100 - 50) / 1000; // Small, stable offset
+            const offsetLng = ((parseInt(seed, 10) * 7) % 100 - 50) / 1000; // Different stable offset
             
             zones.push({
-              id: `alert-zone-${index}`,
+              id: `alert-zone-${alert.id || index}`,
               center: [lat + offsetLat, lng + offsetLng],
               radius: alert.severity === 'emergency' ? 8000 : 
                      alert.severity === 'alert' ? 5000 : 3000,
@@ -191,7 +193,7 @@ export function InteractiveThreatMap() {
           });
         }
 
-        // Military installation zones (simulated based on location)
+        // Military installation zones (stable position based on location)
         if (distanceFromBorder < 50) {
           zones.push({
             id: 'military-zone',
@@ -210,8 +212,10 @@ export function InteractiveThreatMap() {
       setThreatZones(zones);
     };
 
-    generateThreatZones();
-  }, [selectedLocation, alerts, threats]);
+    // Only regenerate when location changes significantly or alerts actually change
+    const timeoutId = setTimeout(generateThreatZones, 300); // Debounce rapid updates
+    return () => clearTimeout(timeoutId);
+  }, [selectedLocation?.lat, selectedLocation?.lng, selectedLocation?.name, alerts?.length]);
 
   // Generate safe zones
   useEffect(() => {

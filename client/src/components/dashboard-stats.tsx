@@ -11,6 +11,18 @@ export function DashboardStats() {
     refetchInterval: 60000, // Refresh every minute
   });
 
+  // Get live alerts to calculate real threat data
+  const { data: alerts } = useQuery({
+    queryKey: [API_ENDPOINTS.ALERTS],
+    refetchInterval: 10000, // Refresh every 10 seconds
+  });
+
+  // Get AI threat prediction for confidence score
+  const { data: aiPrediction } = useQuery({
+    queryKey: [API_ENDPOINTS.AI_PREDICTION],
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -36,24 +48,55 @@ export function DashboardStats() {
     );
   }
 
+  // Calculate real-time threat statistics from live data
+  const calculateThreatStats = () => {
+    if (!alerts || !Array.isArray(alerts)) return { activeThreats: 0, criticalThreats: 0 };
+    
+    const activeThreats = alerts.filter(alert => 
+      alert.severity === 'emergency' || alert.severity === 'alert'
+    ).length;
+    
+    const criticalThreats = alerts.filter(alert => 
+      alert.severity === 'emergency'
+    ).length;
+    
+    return { activeThreats, criticalThreats };
+  };
+
+  const threatStats = calculateThreatStats();
+  const aiConfidence = aiPrediction?.confidence ? Math.round(aiPrediction.confidence * 100) : 98.7;
+  const threatLevel = aiPrediction?.threatLevel || 'medium';
+
+  // Determine status based on actual threat level
+  const getThreatStatus = (level: string) => {
+    switch (level) {
+      case 'critical': return { status: 'CRITICAL', color: 'bg-red-500', gradient: 'from-red-500 via-red-600 to-red-700' };
+      case 'high': return { status: 'HIGH ALERT', color: 'bg-orange-500', gradient: 'from-orange-500 via-red-500 to-red-600' };
+      case 'medium': return { status: 'MONITORING', color: 'bg-yellow-500', gradient: 'from-yellow-500 via-orange-500 to-orange-600' };
+      default: return { status: 'SECURE', color: 'bg-green-500', gradient: 'from-emerald-500 via-green-500 to-emerald-600' };
+    }
+  };
+
+  const currentThreatStatus = getThreatStatus(threatLevel);
+
   const statCards = [
     {
       title: "Threat Level",
-      value: stats?.activeThreats || 0,
+      value: threatStats.activeThreats,
       icon: Shield,
-      gradient: "from-emerald-500 via-green-500 to-emerald-600",
-      iconBg: "bg-gradient-to-br from-emerald-500 to-green-600",
-      status: "SECURE",
-      statusColor: "bg-green-500",
-      trend: "+12% containment efficiency",
-      trendIcon: TrendingUp,
-      trendColor: "text-emerald-600",
+      gradient: currentThreatStatus.gradient,
+      iconBg: `bg-gradient-to-br ${currentThreatStatus.gradient}`,
+      status: currentThreatStatus.status,
+      statusColor: currentThreatStatus.color,
+      trend: threatLevel === 'critical' ? 'High activity detected' : '+12% containment efficiency',
+      trendIcon: threatLevel === 'critical' ? TriangleAlert : TrendingUp,
+      trendColor: threatLevel === 'critical' ? 'text-red-600' : 'text-emerald-600',
       description: "Active security protocols",
-      glow: "shadow-emerald-500/25",
+      glow: threatLevel === 'critical' ? 'shadow-red-500/25' : 'shadow-emerald-500/25',
     },
     {
       title: "Intelligence Reports",
-      value: stats?.pendingReports || 0,
+      value: alerts ? alerts.length : 0,
       icon: Activity,
       gradient: "from-orange-500 via-amber-500 to-yellow-500",
       iconBg: "bg-gradient-to-br from-orange-500 to-amber-600",
@@ -67,7 +110,7 @@ export function DashboardStats() {
     },
     {
       title: "AI Neural Network",
-      value: `${stats?.aiConfidence || 98.7}%`,
+      value: `${aiConfidence}%`,
       icon: Brain,
       gradient: "from-purple-500 via-violet-500 to-purple-600",
       iconBg: "bg-gradient-to-br from-purple-500 to-violet-600",
@@ -81,7 +124,7 @@ export function DashboardStats() {
     },
     {
       title: "Safe Corridors",
-      value: stats?.safeZones || 8,
+      value: 8,
       icon: MapPin,
       gradient: "from-blue-500 via-cyan-500 to-blue-600",
       iconBg: "bg-gradient-to-br from-blue-500 to-cyan-600",
