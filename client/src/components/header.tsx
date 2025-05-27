@@ -1,7 +1,8 @@
-import { Shield, Menu, Phone, Moon, Sun, User } from "lucide-react";
+import { Shield, Menu, Phone, Moon, Sun, User, Bell, Activity, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/theme-provider";
 import { Link, useLocation } from "wouter";
+import { Badge } from "@/components/ui/badge";
 import {
   Sheet,
   SheetContent,
@@ -13,11 +14,11 @@ export function Header() {
   const [location] = useLocation();
 
   const navigation = [
-    { name: "Dashboard", href: "/", icon: "home" },
-    { name: "Alerts", href: "/alerts", icon: "bell" },
-    { name: "Reports", href: "/reports", icon: "camera" },
-    { name: "Safety Zones", href: "/safety", icon: "map" },
-    { name: "Education", href: "/education", icon: "book" },
+    { name: "Command Center", href: "/", icon: Activity },
+    { name: "Live Alerts", href: "/alerts", icon: Bell },
+    { name: "Intel Reports", href: "/reports", icon: Zap },
+    { name: "Safe Zones", href: "/safety", icon: Shield },
+    { name: "Training Hub", href: "/education", icon: User },
   ];
 
   const isActive = (href: string) => {
@@ -26,101 +27,141 @@ export function Header() {
   };
 
   return (
-    <header className="bg-white dark:bg-gray-800 shadow-lg border-b-2 border-saffron">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo and Brand */}
-          <Link href="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
-            <div className="w-10 h-10 bg-gradient-to-br from-saffron to-indian-green rounded-lg flex items-center justify-center">
-              <Shield className="text-white" size={20} />
+    <header className="glass-card backdrop-blur-xl bg-white/80 dark:bg-gray-900/80 border-0 border-b border-white/20 dark:border-gray-700/50">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="flex justify-between items-center h-20">
+          {/* Enhanced Logo and Brand */}
+          <Link href="/" className="flex items-center space-x-4 group hover:scale-105 transition-all duration-300">
+            <div className="relative">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 via-purple-600 to-blue-700 flex items-center justify-center shadow-lg">
+                <Shield className="text-white drop-shadow-md" size={24} />
+              </div>
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
             </div>
-            <div>
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white">SurakshaSetu</h1>
-              <p className="text-xs text-gray-600 dark:text-gray-300">Bridge to Safety</p>
+            <div className="hidden sm:block">
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                SurakshaSetu
+              </h1>
+              <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">Advanced Security Platform</p>
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8">
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={`text-sm font-medium transition-colors ${
-                  isActive(item.href)
-                    ? "text-saffron"
-                    : "text-gray-700 dark:text-gray-200 hover:text-saffron"
-                }`}
-              >
-                {item.name}
-              </Link>
-            ))}
+          {/* Modern Desktop Navigation */}
+          <nav className="hidden lg:flex items-center space-x-2 bg-white/60 dark:bg-gray-800/60 rounded-full px-3 py-2 backdrop-blur-md border border-white/20">
+            {navigation.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={`flex items-center space-x-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
+                    isActive(item.href)
+                      ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg transform scale-105"
+                      : "text-gray-700 dark:text-gray-200 hover:bg-white/80 dark:hover:bg-gray-700/80 hover:scale-105"
+                  }`}
+                >
+                  <Icon size={16} className={isActive(item.href) ? "text-white" : ""} />
+                  <span className="hidden xl:inline">{item.name}</span>
+                </Link>
+              );
+            })}
           </nav>
 
-          {/* Action Buttons */}
-          <div className="flex items-center space-x-4">
-            {/* Emergency Button */}
+          {/* Advanced Action Bar */}
+          <div className="flex items-center space-x-3">
+            {/* Status Indicator */}
+            <div className="hidden md:flex items-center space-x-2 px-3 py-2 bg-green-500/10 rounded-full border border-green-500/20">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <span className="text-xs font-medium text-green-700 dark:text-green-400">System Online</span>
+            </div>
+
+            {/* Emergency Command Button */}
             <Button
-              className="bg-alert-red hover:bg-red-700 text-white pulse-urgent"
+              className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-lg transform hover:scale-105 transition-all duration-300 border-0"
               size="sm"
-              onClick={() => {
-                // Handle emergency call
-                window.open("tel:112", "_self");
-              }}
+              onClick={() => window.open("tel:112", "_self")}
             >
               <Phone size={16} className="mr-2" />
-              Emergency
+              <span className="hidden sm:inline">Emergency</span>
+              <div className="absolute inset-0 bg-red-400/20 rounded-md animate-ping"></div>
+            </Button>
+
+            {/* Notification Bell */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative hover:bg-white/80 dark:hover:bg-gray-700/80 transition-all duration-300"
+            >
+              <Bell size={18} />
+              <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 bg-red-500 text-white text-xs flex items-center justify-center animate-pulse">
+                3
+              </Badge>
             </Button>
 
             {/* Theme Toggle */}
             <Button
-              variant="outline"
+              variant="ghost"
               size="icon"
               onClick={toggleTheme}
-              className="border-gray-200 dark:border-gray-700"
+              className="hover:bg-white/80 dark:hover:bg-gray-700/80 transition-all duration-300 hover:scale-110"
             >
               {theme === "dark" ? (
-                <Sun size={16} />
+                <Sun size={18} className="text-yellow-500" />
               ) : (
-                <Moon size={16} />
+                <Moon size={18} className="text-blue-600" />
               )}
             </Button>
 
-            {/* Profile */}
+            {/* Profile Avatar */}
             <Button
-              variant="outline"
+              variant="ghost"
               size="icon"
-              className="border-gray-200 dark:border-gray-700"
+              className="relative overflow-hidden hover:bg-white/80 dark:hover:bg-gray-700/80 transition-all duration-300 hover:scale-110"
             >
-              <User size={16} />
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                <User size={16} className="text-white" />
+              </div>
             </Button>
 
             {/* Mobile Menu */}
             <Sheet>
               <SheetTrigger asChild>
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   size="icon"
-                  className="md:hidden border-gray-200 dark:border-gray-700"
+                  className="lg:hidden hover:bg-white/80 dark:hover:bg-gray-700/80 transition-all duration-300"
                 >
-                  <Menu size={16} />
+                  <Menu size={18} />
                 </Button>
               </SheetTrigger>
-              <SheetContent>
-                <div className="flex flex-col space-y-4 mt-8">
-                  {navigation.map((item) => (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      className={`text-lg font-medium p-2 rounded-lg transition-colors ${
-                        isActive(item.href)
-                          ? "bg-saffron text-white"
-                          : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                      }`}
-                    >
-                      {item.name}
-                    </Link>
-                  ))}
+              <SheetContent className="glass-card backdrop-blur-xl bg-white/90 dark:bg-gray-900/90 border-white/20">
+                <div className="flex flex-col space-y-6 mt-12">
+                  <div className="flex items-center space-x-4 pb-6 border-b border-white/20">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                      <Shield className="text-white" size={20} />
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-bold">SurakshaSetu</h2>
+                      <p className="text-sm text-gray-500">Security Command</p>
+                    </div>
+                  </div>
+                  {navigation.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        className={`flex items-center space-x-4 p-4 rounded-xl transition-all duration-300 ${
+                          isActive(item.href)
+                            ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg"
+                            : "text-gray-700 dark:text-gray-200 hover:bg-white/60 dark:hover:bg-gray-700/60"
+                        }`}
+                      >
+                        <Icon size={20} />
+                        <span className="font-medium">{item.name}</span>
+                      </Link>
+                    );
+                  })}
                 </div>
               </SheetContent>
             </Sheet>

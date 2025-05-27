@@ -2,28 +2,41 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Modern Security Theme - Elegant & Professional */
+/* Ultra-Modern Security Theme - Professional & Cutting Edge */
 :root {
-  --background: 220 15% 98%; /* #F8FAFC */
-  --foreground: 220 25% 8%; /* #0F172A */
+  --background: 210 11% 96%; /* #F8FAFC */
+  --foreground: 222 84% 5%; /* #020617 */
   --card: 0 0% 100%; /* #FFFFFF */
-  --card-foreground: 220 25% 8%; /* #0F172A */
+  --card-foreground: 222 84% 5%; /* #020617 */
   --popover: 0 0% 100%; /* #FFFFFF */
-  --popover-foreground: 220 25% 8%; /* #0F172A */
-  --primary: 210 100% 56%; /* #1E90FF */
-  --primary-foreground: 0 0% 100%; /* #FFFFFF */
-  --secondary: 210 30% 96%; /* #F1F5F9 */
-  --secondary-foreground: 220 25% 20%; /* #334155 */
-  --muted: 210 20% 95%; /* #F1F5F9 */
-  --muted-foreground: 220 15% 50%; /* #64748B */
+  --popover-foreground: 222 84% 5%; /* #020617 */
+  --primary: 221 83% 53%; /* #3B82F6 */
+  --primary-foreground: 210 40% 98%; /* #F8FAFC */
+  --secondary: 210 40% 98%; /* #F1F5F9 */
+  --secondary-foreground: 222 47% 11%; /* #1E293B */
+  --muted: 210 40% 96%; /* #F1F5F9 */
+  --muted-foreground: 215 16% 47%; /* #64748B */
   --accent: 262 83% 58%; /* #8B5CF6 */
-  --accent-foreground: 0 0% 100%; /* #FFFFFF */
-  --destructive: 0 85% 60%; /* #EF4444 */
-  --destructive-foreground: 0 0% 100%; /* #FFFFFF */
-  --border: 220 15% 90%; /* #E2E8F0 */
-  --input: 220 15% 90%; /* #E2E8F0 */
-  --ring: 210 100% 56%; /* #1E90FF */
+  --accent-foreground: 210 40% 98%; /* #F8FAFC */
+  --destructive: 0 84% 60%; /* #EF4444 */
+  --destructive-foreground: 210 40% 98%; /* #F8FAFC */
+  --border: 214 32% 91%; /* #E2E8F0 */
+  --input: 214 32% 91%; /* #E2E8F0 */
+  --ring: 221 83% 53%; /* #3B82F6 */
   --radius: 0.75rem;
+  
+  /* Advanced gradient system */
+  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  --gradient-warning: linear-gradient(135deg, #fdbb2d 0%, #22c1c3 100%);
+  --gradient-danger: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+  --gradient-purple: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  
+  /* Glass morphism variables */
+  --glass-bg: rgba(255, 255, 255, 0.25);
+  --glass-border: rgba(255, 255, 255, 0.18);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
 }
 
 .dark {
