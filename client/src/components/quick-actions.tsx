@@ -1,4 +1,4 @@
-import { Phone, Camera, MapPin, Brain, MapPinned } from "lucide-react";
+import { Phone, Camera, MapPin, Brain, GraduationCap } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -73,17 +73,9 @@ export function QuickActions() {
     window.open("tel:112", "_self");
   };
 
-  const handleFindSafeZone = () => {
-    if (!latitude || !longitude) {
-      toast({
-        title: "Location Required",
-        description: "Please enable location services to find nearby safe zones",
-        variant: "destructive",
-      });
-      return;
-    }
-    // Navigate to safety zones page with current location
-    window.location.href = `/safety?lat=${latitude}&lng=${longitude}`;
+  const handleSafetyCenter = () => {
+    // Navigate to safety center page
+    window.location.href = `/safety-center`;
   };
 
   return (
@@ -112,11 +104,11 @@ export function QuickActions() {
           </Link>
           
           <Button
-            onClick={handleFindSafeZone}
+            onClick={handleSafetyCenter}
             className="w-full bg-navy hover:bg-blue-800 text-white p-3 h-auto font-medium"
           >
-            <MapPinned className="mr-2" size={18} />
-            Find Safe Zone
+            <GraduationCap className="mr-2" size={18} />
+            Safety Center
           </Button>
         </CardContent>
       </Card>
