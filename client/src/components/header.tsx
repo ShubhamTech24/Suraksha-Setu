@@ -25,9 +25,7 @@ export function Header() {
     { name: "Command Center", href: "/", icon: Activity },
     { name: "Live Alerts", href: "/alerts", icon: Bell },
     { name: "Intel Reports", href: "/reports", icon: Zap },
-    { name: "Safe Zones", href: "/safety", icon: Shield },
-    { name: "Safety Center", href: "/safety-center", icon: User },
-    { name: "Training Hub", href: "/education", icon: User },
+    { name: "Safety Center", href: "/safety-center", icon: Shield },
   ];
 
   const isActive = (href: string) => {
