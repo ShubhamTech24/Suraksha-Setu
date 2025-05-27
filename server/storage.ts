@@ -48,6 +48,15 @@ export interface IStorage {
   getEmergencyContacts(): Promise<EmergencyContact[]>;
   getEmergencyContact(id: number): Promise<EmergencyContact | undefined>;
   createEmergencyContact(contact: InsertEmergencyContact): Promise<EmergencyContact>;
+
+  // Chat messages
+  getChatMessages(userId?: number, receiverId?: number): Promise<ChatMessage[]>;
+  createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
+  markMessageAsRead(messageId: number): Promise<void>;
+
+  // Report comments
+  getReportComments(reportId: number): Promise<ReportComment[]>;
+  createReportComment(comment: InsertReportComment): Promise<ReportComment>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -222,6 +231,49 @@ export class DatabaseStorage implements IStorage {
   async createEmergencyContact(contact: InsertEmergencyContact): Promise<EmergencyContact> {
     const [newContact] = await db.insert(emergencyContacts).values(contact).returning();
     return newContact;
+  }
+
+  // Chat messages implementation
+  async getChatMessages(userId?: number, receiverId?: number): Promise<ChatMessage[]> {
+    let query = db.select().from(chatMessages);
+    
+    if (userId && receiverId) {
+      query = query.where(
+        or(
+          and(eq(chatMessages.senderId, userId), eq(chatMessages.receiverId, receiverId)),
+          and(eq(chatMessages.senderId, receiverId), eq(chatMessages.receiverId, userId))
+        )
+      );
+    } else if (userId) {
+      query = query.where(
+        or(eq(chatMessages.senderId, userId), eq(chatMessages.receiverId, userId))
+      );
+    }
+    
+    return await query.orderBy(desc(chatMessages.createdAt));
+  }
+
+  async createChatMessage(message: InsertChatMessage): Promise<ChatMessage> {
+    const [newMessage] = await db.insert(chatMessages).values(message).returning();
+    return newMessage;
+  }
+
+  async markMessageAsRead(messageId: number): Promise<void> {
+    await db.update(chatMessages)
+      .set({ isRead: true })
+      .where(eq(chatMessages.id, messageId));
+  }
+
+  // Report comments implementation
+  async getReportComments(reportId: number): Promise<ReportComment[]> {
+    return await db.select().from(reportComments)
+      .where(eq(reportComments.reportId, reportId))
+      .orderBy(desc(reportComments.createdAt));
+  }
+
+  async createReportComment(comment: InsertReportComment): Promise<ReportComment> {
+    const [newComment] = await db.insert(reportComments).values(comment).returning();
+    return newComment;
   }
 }
 
