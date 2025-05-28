@@ -83,10 +83,14 @@ export function DashboardEmergencyCommunication() {
     },
   });
 
-  // Auto-scroll to bottom when new messages arrive
+  // Auto-scroll to bottom only when new messages arrive (not on initial load)
+  const [prevMessageCount, setPrevMessageCount] = useState(0);
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    if (messages.length > prevMessageCount && prevMessageCount > 0) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+    setPrevMessageCount(messages.length);
+  }, [messages, prevMessageCount]);
 
   // Check network status
   useEffect(() => {
