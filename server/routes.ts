@@ -384,6 +384,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Chat message endpoints
+  app.post("/api/chat", async (req, res) => {
+    try {
+      const { message, senderId, receiverId, messageType = 'emergency' } = req.body;
+      
+      if (!message || !senderId) {
+        return res.status(400).json({ message: "Message and senderId are required" });
+      }
+
+      const newMessage = await storage.createChatMessage({
+        senderId,
+        receiverId: receiverId || null, // null means broadcast to admins
+        message,
+        messageType,
+      });
+      
+      // Broadcast emergency message to all connected clients (especially admins)
+      broadcast({
+        type: 'emergency_message',
+        data: newMessage,
+        timestamp: new Date().toISOString()
+      });
+      
+      res.json(newMessage);
+    } catch (error) {
+      console.error('Chat message error:', error);
+      res.status(500).json({ message: "Failed to send message" });
+    }
+  });
+
+  // Get emergency chat messages for dashboard
+  app.get("/api/chat/emergency", async (req, res) => {
+    try {
+      // Get all emergency messages (civilian to admin communication)
+      const messages = await storage.getChatMessages();
+      res.json(messages);
+    } catch (error) {
+      console.error('Failed to fetch emergency messages:', error);
+      res.status(500).json({ message: "Failed to fetch emergency messages" });
+    }
+  });
+
+  // Get admin chat messages
+  app.get("/api/admin/chat", async (req, res) => {
+    try {
+      const messages = await storage.getChatMessages();
+      res.json(messages);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch chat messages" });
+    }
+  });
+
   // Location tracking endpoints
   app.post("/api/location/update", async (req, res) => {
     try {
@@ -568,17 +620,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
         receiverId,
         message,
         messageType,
-        isRead: false
       });
       
       // Broadcast message to all connected clients
       broadcast({
-        type: 'new_message',
-        data: newMessage
+        type: 'admin_reply',
+        data: newMessage,
+        timestamp: new Date().toISOString()
       });
       
       res.json(newMessage);
     } catch (error) {
+      res.status(500).json({ message: "Failed to send message" });
+    }
+  });
+
+  // Send message from dashboard
+  app.post("/api/chat/send", async (req, res) => {
+    try {
+      const { message, messageType = 'emergency_communication', senderId, receiverId } = req.body;
+      
+      if (!message || !senderId) {
+        return res.status(400).json({ message: "Message and senderId are required" });
+      }
+
+      const newMessage = await storage.createChatMessage({
+        senderId,
+        receiverId: receiverId || null,
+        message,
+        messageType,
+      });
+      
+      // Broadcast message to all connected clients
+      broadcast({
+        type: 'dashboard_message',
+        data: newMessage,
+        timestamp: new Date().toISOString()
+      });
+      
+      res.json(newMessage);
+    } catch (error) {
+      console.error('Dashboard message error:', error);
       res.status(500).json({ message: "Failed to send message" });
     }
   });
