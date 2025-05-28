@@ -4,11 +4,15 @@ step to setup suraksha_setu
 1) extract zip file and open it in vscode 
 2) Open new terminal in vscode 
 3) in terminal type: npm install
-4) you have to install dotenv in vscode terminal using this command: npm install dotenv
 
+   		npm install
+5) you have to install dotenv in vscode terminal using this command: npm install dotenv
+
+   		npm install dotenv
+   		
 step to run project 
 
 1) To run project you have to type this below string in vscode terminal:
 
-		-> npm run dev
+		npm run dev
 	
