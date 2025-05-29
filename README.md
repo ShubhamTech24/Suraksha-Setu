@@ -16,3 +16,7 @@ step to run project
 
 		npm run dev
 	
+step to login and sign up
+1) To login you have to first create your account
+2) After that user can able to login to appliaction 
+
